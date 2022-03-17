@@ -1,0 +1,139 @@
+﻿<Window x:Class="DispoAdmin.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DispoAdmin" 
+        xmlns:viewmodels="clr-namespace:DispoAdmin.ViewModels" 
+        d:DataContext="{d:DesignInstance Type=viewmodels:MainWindowViewModel}"
+        mc:Ignorable="d"
+        
+       Title="My 3D-Printer Farm" Height="400" Width="633">
+    <Grid>
+        <Grid.ColumnDefinitions>
+        </Grid.ColumnDefinitions>
+        <TabControl Grid.ColumnSpan="2">
+            <TabItem Header="Cockpit">
+                <Label Content="My 3D Printer Farm" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30"/>
+            </TabItem>
+            <TabItem Header="Printers" HorizontalAlignment="Left" Width="52" >
+                <DockPanel Margin="10">
+                    <StackPanel DockPanel.Dock="Right" Margin="10,0,0,0">
+                        <Button Content="Add Printer" Command="{Binding CmdAddPrinter}" Margin="0,5" />
+                        <Button Content="Remove Printer" Command="{Binding CmdRemovePrinter}" Margin="0,5"/>
+                        <Button Content="SAVE" Command="{Binding CmdSaveStuff}" Margin="0,5"/>
+                    </StackPanel>
+                    
+                    <DataGrid ItemsSource="{Binding ListPrinters}" SelectedItem="{Binding SelectedPrinter}" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Printer" Binding="{Binding PrinterType}" FontSize="10"/>
+                            <DataGridTextColumn Header="ServiceTime" Binding="{Binding ServiceTimeEst}"   />
+                            <DataGridTemplateColumn Header="Purchase Date">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <DatePicker SelectedDate="{Binding PrinterPurchDate}" BorderThickness="0" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="Purchase Price" Binding="{Binding PrinterPurchPrice}"  />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    
+
+                </DockPanel>
+            </TabItem>
+
+            <TabItem Header="Orders" >
+                <DockPanel Margin="10">
+                    <StackPanel DockPanel.Dock="Right" Margin="10,0,0,0">
+                        <Button Content="Add Order" Command="{Binding CmdAddOrder}" Margin="0,5" />
+                        <Button Content="Remove Order" Command="{Binding CmdRemoveOrder}" Margin="0,5" />
+                        <Button Content="View Order" Command="{Binding CmdViewOrder}" Margin="0,5" />
+                        <Button Content="SAVE" Command="{Binding CmdSaveStuff}" Margin="0,5"/>
+
+                    </StackPanel>
+
+                    <DataGrid ItemsSource="{Binding ListOrders}" SelectedItem="{Binding SelectedOrder}" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+
+                            <DataGridTextColumn Header="Customer" Binding="{Binding CustomerName}" />
+                            <DataGridTextColumn Header="Order" Binding="{Binding OrderName}"   />
+                            <DataGridTemplateColumn Header="Date In">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <DatePicker SelectedDate="{Binding DateIn}" BorderThickness="0" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Deadline">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <DatePicker SelectedDate="{Binding DateDue}" BorderThickness="0" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="Price (EUR)" Binding="{Binding OrderPrice}"  />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </TabItem>
+
+            <TabItem Header="Material" >
+                <DockPanel Margin="10">
+                    <StackPanel DockPanel.Dock="Right" Margin="10,0,0,0">
+                        <Button Content="Add Material" Command="{Binding CmdAddMaterial}" Margin="0,5" />
+                        <Button Content="Remove Material" Command="{Binding CmdRemoveMaterial}" Margin="0,5" />
+                        <Button Content="SAVE" Command="{Binding CmdSaveStuff}" Margin="0,5"/>
+                    </StackPanel>
+                    <DataGrid ItemsSource="{Binding ListMaterials}" SelectedItem="{Binding SelectedMaterial}" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Material" Binding="{Binding MaterialName}" FontSize="10"/>
+                            <DataGridTextColumn Header="Price per Kg" Binding="{Binding MaterialPrice}"  />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+
+            </TabItem>
+            <TabItem Header="Schedule">
+                <StackPanel DockPanel.Dock="Right" Margin="80,50,80,80">
+                    <TextBox HorizontalAlignment="Center" Height="25" TextWrapping="Wrap"  Text="{Binding scheduleWeek}"  VerticalAlignment="Center" Width="110" />
+                    <Button Content="Original Schedule" Command="{Binding CmdRegSchedule}" Margin="0,5" />
+                    <Button Content="Optimized Schedule" Command="{Binding CmdOptSchedule}" Margin="0,5" />
+                </StackPanel>
+            </TabItem>
+
+            <TabItem Header="Incident Log">
+                <DockPanel Margin="10">
+                    <StackPanel DockPanel.Dock="Right" Margin="10,0,0,0">
+                        <Button Content="Add Service Incident" Command="{Binding CmdAddService}" Margin="0,5" />
+                        <Button Content="Remove Service Incident" Command="{Binding CmdRemoveService}" Margin="0,5" />
+                        <Button Content="SAVE" Command="{Binding CmdSaveStuff}" Margin="0,5"/>
+                    </StackPanel>
+
+                    <DataGrid ItemsSource="{Binding ListServices}" SelectedItem="{Binding SelectedService}" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Incident Name" Binding="{Binding EventName}" FontSize="10"/>
+                            <DataGridTextColumn Header="Event Category" Binding="{Binding EventCategory}"   />
+                            <DataGridTextColumn Header="Event Length hrs" Binding="{Binding EventLength_hrs}"   />
+                            <DataGridTemplateColumn Header="Incident Date">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <DatePicker SelectedDate="{Binding EventDate}" BorderThickness="0" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="Event Cost" Binding="{Binding EventCost_euro}"  />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+
+            </TabItem>
+
+            <TabItem Header="Kosten und Erträge">
+
+
+            </TabItem>
+
+        </TabControl>
+    </Grid>
+</Window>
