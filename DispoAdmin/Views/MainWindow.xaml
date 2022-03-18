@@ -97,8 +97,7 @@
             <TabItem Header="Schedule">
                 <StackPanel DockPanel.Dock="Right" Margin="80,50,80,80">
                     <TextBox HorizontalAlignment="Center" Height="25" TextWrapping="Wrap"  Text="{Binding scheduleWeek}"  VerticalAlignment="Center" Width="110" />
-                    <Button Content="Original Schedule" Command="{Binding CmdRegSchedule}" Margin="0,5" />
-                    <Button Content="Optimized Schedule" Command="{Binding CmdOptSchedule}" Margin="0,5" />
+                    <Button Content="Schedule (enter week number above)" Command="{Binding CmdRegSchedule}" Margin="0,5" />
                 </StackPanel>
             </TabItem>
 

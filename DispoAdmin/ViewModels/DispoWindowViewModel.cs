@@ -17,7 +17,7 @@ using System.Windows;
 
 namespace DispoAdmin.ViewModels
 {
-    class DispoWindowViewModel : BaseViewModel
+    public class DispoWindowViewModel : BaseViewModel
     {
         private int _scheduleWeek;
         public int ScheduleWeek
@@ -46,11 +46,9 @@ namespace DispoAdmin.ViewModels
             }
         }
 
-        private int jobPosition;
+        //private int jobPosition;
 
-        List<Button> Controls = new List<Button>();
-
-        private readonly Grid Dispogrid;
+        //List<Button> Controls = new List<Button>();
 
         public DispoWindowViewModel(int scheduleWeek)
         {
@@ -59,14 +57,19 @@ namespace DispoAdmin.ViewModels
             _listSchedules = new ObservableCollection<Schedule>();
             LoadSchedule();
 
-            Random rnd = new Random();
+            //Binding to Dispogrid not working ! Ported back to DispoWindow.cs.........
+
+            /*Random rnd = new Random();
 
             jobPosition = 0;
 
             for (int i = 0; i < ListSchedules.Count; i++)
             {
-                ExtendedButton b = new ExtendedButton(); // unique MessageBox used here only works with ExtendedButton
-                b._myval = ListSchedules[i].PrintJob.JobName.ToString() + " " + ListSchedules[i].PrintJob.JobOrder.ToString() + " " + ListSchedules[i].PrintJob.Material.ToString();//this assigns some job details to the extended button
+                ExtendedButton b = new ExtendedButton(); 
+                // unique MessageBox used here operates with ExtendedButton
+                b._myval = ListSchedules[i].PrintJob.JobName.ToString() + " " + ListSchedules[i].PrintJob.JobOrder.ToString() + " " + ListSchedules[i].PrintJob.Material.ToString();
+                //this assigns some job details to the extended button
+
                 b.Click += new RoutedEventHandler(OnButtonClick);
                 this.Controls.Add(b);
                 DeButnPlace(b, i, 1);
@@ -105,7 +108,7 @@ namespace DispoAdmin.ViewModels
                 PropertyInfo[] properties = brushesType.GetProperties();
                 result = (Brush)properties[random].GetValue(null, null);
                 return result;
-            }
+            }*/
 
         }
 
@@ -114,14 +117,16 @@ namespace DispoAdmin.ViewModels
             ListSchedules.Clear();    // clear existing jobs schedule
             using (PrinterfarmContext context = DispoAdminModel.Default.GetDBContext())
             {
-                var result = from k in context.Schedules.Include(k => k.ScheduleWeek) orderby k.TimeStart select k;
+                var result = from k in context.Schedules/*.Include(k => k.ScheduleWeek)*/
+                             where k.ScheduleWeek == this.ScheduleWeek
+                             orderby k.TimeStart select k;
                 foreach (Schedule k in result)
                 {
                     ListSchedules.Add(k);
                 }
             }
         }
-        class ExtendedButton : Button //this class inherits from button
+        /*class ExtendedButton : Button //this class inherits from button
         {
             //constructor
             public ExtendedButton()
@@ -133,6 +138,6 @@ namespace DispoAdmin.ViewModels
                 get { return myval; }
                 set { myval = value; }
             }
-        }
+        }*/
     }
 }
