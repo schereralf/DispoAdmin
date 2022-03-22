@@ -57,33 +57,32 @@ namespace DispoAdmin.ViewModels
         public ICommand CmdAddPrintJob { get { return _cmdAddPrintJob; } }
         public ICommand CmdRemovePrintJob { get { return _cmdRemovePrintJob; } }
         public ICommand CmdParsePrintJob { get { return _cmdParsePrintJob; } }
-        // Konstruktor mit Parameter
-        public OrderWindowViewModel(Order order)
-        {
-            this.Order = order;
+		// Konstruktor mit Parameter
+		public OrderWindowViewModel(Order order)
+		{
+			this.Order = order;
 
-            _listPrintJobs = new ObservableCollection<PrintJob>();
+			_listPrintJobs = new ObservableCollection<PrintJob>();
 
-            _cmdAddPrintJob = new RelayCommand(AddPrintJob, () => SelectedPrintJob != null);
-            _cmdRemovePrintJob = new RelayCommand(RemovePrintJob, () => SelectedPrintJob != null);
-            _cmdParsePrintJob = new RelayCommand(ParsePrintJob, () => SelectedPrintJob != null);
-
-            LoadPrintJob();
-        }
+			_cmdAddPrintJob = new RelayCommand(AddPrintJob, () => SelectedPrintJob != null);
+			_cmdRemovePrintJob = new RelayCommand(RemovePrintJob, () => SelectedPrintJob != null);
+			_cmdParsePrintJob = new RelayCommand(ParsePrintJob, () => SelectedPrintJob != null);
 
 
-        public void LoadPrintJob()
-        {
-            //_listPrintJobs.Clear();    // clear old data
-            using (PrinterfarmContext context = DispoAdminModel.Default.GetDBContext())
-            {
-                var result = from k in context.PrintJobs.Include(k => k.Order) orderby k.JobName select k;
-                foreach (PrintJob k in result)
-                {
-                    _listPrintJobs.Add(k);
-                }
-            }
-        }
+			using (PrinterfarmContext context = DispoAdminModel.Default.GetDBContext())
+			{
+				var result = from k in context.PrintJobs
+							 where k.Order == this.Order
+							 orderby k.JobName
+							 select k;
+				foreach (PrintJob k in result)
+				{
+					_listPrintJobs.Add(k);
+				}
+
+					context.SaveChanges();
+			}
+		}
         public void AddPrintJob()
         {
             ListPrintJobs.Add(SelectedPrintJob);

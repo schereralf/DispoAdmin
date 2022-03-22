@@ -26,7 +26,7 @@ namespace DispoAdmin.ViewModels
             set
             {
                 _scheduleWeek = value;
-                OnPropertyChanged();
+                //OnPropertyChanged();
             }                
         }
 

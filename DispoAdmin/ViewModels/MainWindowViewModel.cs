@@ -63,7 +63,7 @@ namespace DispoAdmin.ViewModels
             }
         }
         // Scheduler tab needs only field to specify week and the window start button 
-        public int scheduleWeek
+        public int ScheduleWeek
         {   
             get { return _scheduleWeek; }
             set
@@ -215,7 +215,7 @@ namespace DispoAdmin.ViewModels
         // Pass over to schedule window
         public void RegSchedule()
         {           
-            DispoWindow scheduleView = new DispoWindow(scheduleWeek);
+            DispoWindow scheduleView = new DispoWindow(ScheduleWeek);
             scheduleView.ShowDialog();  
         }
     }
