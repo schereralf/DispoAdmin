@@ -86,7 +86,7 @@ namespace DispoAdmin.Views
                     int jobRun = (int)Math.Ceiling((decimal)ListSchedules[j].MR_Time + (decimal)ListSchedules[j].RO_Time);
 
                     TimeSpan startTime = (TimeSpan)(ListSchedules[j].TimeStart - new DateTime(2022, 1, 1));
-                    int days = (int)startTime.TotalDays - 2;
+                    int days = (int)startTime.TotalDays - 1;
                     DateTime schedHour = (DateTime)ListSchedules[j].TimeStart;
                     int hours = (int)schedHour.TimeOfDay.TotalHours;
 
