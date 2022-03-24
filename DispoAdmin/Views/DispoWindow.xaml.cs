@@ -27,8 +27,11 @@ namespace DispoAdmin.Views
     {
         public int ScheduleWeek;
 
+        //string dayDateMon = new string;
+
         private ObservableCollection<Schedule> _listSchedules;
         public IList<Schedule> ListSchedules => _listSchedules;
+        List<Printer> ListPrinters= new List<Printer>();
 
         private Schedule _selectedSchedule;
 
@@ -49,12 +52,40 @@ namespace DispoAdmin.Views
             InitializeComponent();
 
             this.ScheduleWeek = scheduleWeek;
+            DateTime dayDateStart = new DateTime(2022, 1, 3);
+
+            int NewDate = (scheduleWeek - 1) * 7;
+
+            //dayDateMon = dayDateStart.AddDays(NewDate).ToString();
+            /*DateTime dayDateTue = dayDateStart.AddDays(NewDate + 1);
+            DateTime dayDateWed = dayDateStart.AddDays(NewDate + 3);
+            DateTime dayDateThu = dayDateStart.AddDays(NewDate + 4);
+            DateTime dayDateFri = dayDateStart.AddDays(NewDate + 5);
+            DateTime dayDateSat = dayDateStart.AddDays(NewDate + 6);
+            DateTime dayDateSun = dayDateStart.AddDays(NewDate + 7);*/
 
             using (PrinterfarmContext context = DispoAdminModel.Default.GetDBContext())
             {
+                ListPrinters.Clear();
+
                 _listSchedules = new ObservableCollection<Schedule>();
 
-                var result = from k in context.Schedules//.Include(k => k.ScheduleWeek)
+                foreach (Printer k in context.Printers) ListPrinters.Add(k);
+
+                for (int i = 0; i < ListPrinters.Count; i++)
+                {
+                    TextBox t = new TextBox();
+                    t.Text = ListPrinters[i].PrinterType;
+                    Grid.SetRow(t, i * 2+1);
+                    Grid.SetColumnSpan(t, 167);
+                    t.Background = PickBrush(22);
+                    t.HorizontalAlignment = HorizontalAlignment.Left;
+                    t.Width = 1000;
+                    Dispogrid.Children.Add(t);
+                }
+
+
+                    var result = from k in context.Schedules//.Include(k => k.ScheduleWeek)
                              where k.ScheduleWeek == this.ScheduleWeek
                              orderby k.TimeStart
                              select k;

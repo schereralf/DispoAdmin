@@ -8,7 +8,7 @@
         d:DataContext="{d:DesignInstance Type=viewmodels:OrderWindowViewModel}"
         mc:Ignorable="d"
         
-        Title="My 3D Printer Farm - Print Jobs" Height="250" Width="450">
+        Title="My 3D Printer Farm - Print Jobs" Height="250" Width="670">
     <DockPanel Margin="20">
         <StackPanel DockPanel.Dock="Right" Margin="10,0,0,0">
             <Button Content="Add PrintJob" Command="{Binding CmdAddPrintJob}" Margin="0,5" />
@@ -20,7 +20,9 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Print Job Name" Binding="{Binding JobName}"/>
                 <DataGridTextColumn Header="Material" Binding="{Binding Material}"/>
-                <DataGridTextColumn Width ="30" Header="LH" Binding="{Binding LayerHeight}"/>
+                <DataGridTextColumn Header="LayerHeight" Binding="{Binding LayerHeight}"/>
+                <DataGridTextColumn Header="Material g" Binding="{Binding WeightMaterial}"/>
+                <DataGridTextColumn Header="PrintTime h" Binding="{Binding PrintTime}"/>
                 <DataGridHyperlinkColumn Width ="240" Header="File Adress" Binding="{Binding GcodeAdresse}"/>
             </DataGrid.Columns>
         </DataGrid>

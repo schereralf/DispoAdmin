@@ -3,11 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:DispoAdmin.Views"
-        xmlns:sched="clr-namespace:DispoAdmin.Scheduler" 
-        xmlns:viewmodels="clr-namespace:DispoAdmin.ViewModels" 
-        d:DataContext="{d:DesignInstance Type=viewmodels:DispoWindowViewModel}"
-        
+        xmlns:local="clr-namespace:DispoAdmin.Views"    
         mc:Ignorable="d"
         
         Title="My 3D Printer Farm Scheduling" Height="300" Width="1000">
@@ -196,6 +192,14 @@
             <RowDefinition Height="1*" />
             <RowDefinition Height="0.3*" />
             <RowDefinition Height="1*" />
+            <RowDefinition Height="0.3*" />
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="0.3*" />
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="0.3*" />
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="0.3*" />
+            <RowDefinition Height="1*" />
 
         </Grid.RowDefinitions>
 
@@ -207,10 +211,7 @@
         <TextBox Grid.Row="0" Grid.Column="120" Grid.ColumnSpan="24" Text="Saturday" HorizontalAlignment="Center" VerticalAlignment="Center"  BorderThickness="2"/>
         <TextBox Grid.Row="0" Grid.Column="144" Grid.ColumnSpan="24" Text="Sunday" HorizontalAlignment="Center" VerticalAlignment="Center"  BorderThickness="2"/>
 
-        <TextBox Grid.Row="1" Grid.ColumnSpan="167" Text="Prusa Mini, 18x18 cm, " HorizontalAlignment="Center" VerticalAlignment="Center" Background="LightGreen" Margin="0,0,1.187,0" Width="1000"/>
-        <TextBox Grid.Row="3" Grid.ColumnSpan="167" Text="Prusa i3, 22x22 cm, " HorizontalAlignment="Center" VerticalAlignment="Center" Background="LightGreen" Margin="0,0,1.187,0" Width="1000"/>
-        <TextBox Grid.Row="5" Grid.ColumnSpan="167" Text="Ender 5, 22x22 cm, " HorizontalAlignment="Center" VerticalAlignment="Center" Background="LightGreen" Margin="0,0,1.187,0" Width="1000"/>
-        <TextBox Grid.Row="7" Grid.ColumnSpan="167" Text="Ultimaker 2+, 22x22 cm, " HorizontalAlignment="Center" VerticalAlignment="Center" Background="LightGreen" Margin="0,0,1.187,0" Width="1000"/>
+       
 
     </Grid>
 </Window>

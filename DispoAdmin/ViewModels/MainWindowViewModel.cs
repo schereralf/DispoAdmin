@@ -148,20 +148,16 @@ namespace DispoAdmin.ViewModels
                 _cmdSaveStuff = new RelayCommand(SaveStuff);
 
                 foreach (Order k in context.Orders) _listOrders.Add(k);
-                //LoadOrder();
                 foreach (Printer k in context.Printers) _listPrinters.Add(k);
-                //LoadPrinter();
                 foreach (ServiceLogEvent k in context.ServiceLogEvents) _listServices.Add(k);
-                //LoadService();
-                foreach (Material k in context.Materials) _listMaterials.Add(k);
-                //LoadMaterial();
+                foreach (Material k in context.Materials) _listMaterials.Add(k);;
+
 
                 context.SaveChanges();
 
                 // A Saving button should be redundant when using ObservableCollection ??
                 void SaveStuff()
-                {
-                    //context.SaveChanges();
+                {      
                 }
             }
         }
