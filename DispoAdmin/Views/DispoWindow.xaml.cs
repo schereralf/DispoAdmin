@@ -78,7 +78,7 @@ namespace DispoAdmin.Views
                     t.Text = ListPrinters[i].PrinterType;
                     Grid.SetRow(t, i * 2+1);
                     Grid.SetColumnSpan(t, 167);
-                    t.Background = PickBrush(22);
+                    t.Background = PickBrush(3);
                     t.HorizontalAlignment = HorizontalAlignment.Left;
                     t.Width = 1000;
                     Dispogrid.Children.Add(t);
