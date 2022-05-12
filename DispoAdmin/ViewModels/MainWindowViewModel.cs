@@ -1,25 +1,22 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
+﻿
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using DispoBaseLib;
 using Model3DFarm;
 using DispoAdmin.Models;
 using DispoAdmin.Views;
 using System.Windows.Input;
-using System.IO;
 
 namespace DispoAdmin.ViewModels
 {
     public class MainWindowViewModel : BaseViewModel
     {
-        private ObservableCollection<Order> _listOrders;
-        private ObservableCollection<Printer> _listPrinters;
-        private ObservableCollection<ServiceLogEvent> _listServices;
-        private ObservableCollection<Material> _listMaterials;
+        //Setup Observable Collections and Items Lists  for each tab
+
+        private readonly ObservableCollection<Order> _listOrders;
+        private readonly ObservableCollection<Printer> _listPrinters;
+        private readonly ObservableCollection<ServiceLogEvent> _listServices;
+        private readonly ObservableCollection<Material> _listMaterials;
 
         public IList<Order> ListOrders => _listOrders;
         public IList<Printer> ListPrinters => _listPrinters;
@@ -32,13 +29,16 @@ namespace DispoAdmin.ViewModels
         private Material _selectedMaterial;
         private int _scheduleWeek;
 
+        //Setup line selection and button actions
+        //Order tab contains button to open jobs listing in "OrderWindow" window for selected order
+
         public Order SelectedOrder
-        {    // für Binding von Auswahl in Liste
+        {    // for binding
             get { return _selectedOrder; }
             set
             {
                 _selectedOrder = value;
-                OnPropertyChanged();               
+                OnPropertyChanged();
                 _cmdViewOrder.RaiseCanExecuteChanged();
                 _cmdAddOrder.RaiseCanExecuteChanged();
                 _cmdRemoveOrder.RaiseCanExecuteChanged();
@@ -46,7 +46,7 @@ namespace DispoAdmin.ViewModels
             }
         }
         public Printer SelectedPrinter
-        {    // für Binding von Auswahl in Liste
+        {    // for binding
             get { return _selectedPrinter; }
             set
             {
@@ -57,21 +57,20 @@ namespace DispoAdmin.ViewModels
                 _cmdSaveStuff.RaiseCanExecuteChanged();
             }
         }
-
-        public int scheduleWeek
-        {    // für Binding von Auswahl in Liste
+        // Scheduler tab needs only field to specify week and the window start button 
+        public int ScheduleWeek
+        {
             get { return _scheduleWeek; }
             set
             {
                 _scheduleWeek = value;
                 OnPropertyChanged();
                 _cmdRegSchedule.RaiseCanExecuteChanged();
-                //_cmdOptSchedule.RaiseCanExecuteChanged();
             }
         }
 
         public ServiceLogEvent SelectedService
-        {    // für Binding von Auswahl in Liste
+        {
             get { return _selectedService; }
             set
             {
@@ -96,121 +95,80 @@ namespace DispoAdmin.ViewModels
             }
         }
 
-        RelayCommand _cmdViewOrder;
-        RelayCommand _cmdAddOrder;
-        RelayCommand _cmdRemoveOrder;
-        RelayCommand _cmdAddPrinter;
-        RelayCommand _cmdRemovePrinter;
-        RelayCommand _cmdAddService;
-        RelayCommand _cmdRemoveService;
-        RelayCommand _cmdRegSchedule;
-        //RelayCommand _cmdOptSchedule;
-        RelayCommand _cmdAddMaterial;
-        RelayCommand _cmdRemoveMaterial;
-        RelayCommand _cmdSaveStuff;
+        readonly RelayCommand _cmdViewOrder;
+        readonly RelayCommand _cmdAddOrder;
+        readonly RelayCommand _cmdRemoveOrder;
+        readonly RelayCommand _cmdAddPrinter;
+        readonly RelayCommand _cmdRemovePrinter;
+        readonly RelayCommand _cmdAddService;
+        readonly RelayCommand _cmdRemoveService;
+        readonly RelayCommand _cmdRegSchedule;
+        readonly RelayCommand _cmdAddMaterial;
+        readonly RelayCommand _cmdRemoveMaterial;
+        readonly RelayCommand _cmdSaveStuff;
 
         public ICommand CmdViewOrder { get { return _cmdViewOrder; } }
         public ICommand CmdAddOrder { get { return _cmdAddOrder; } }
         public ICommand CmdRemoveOrder { get { return _cmdRemoveOrder; } }
-
         public ICommand CmdAddPrinter { get { return _cmdAddPrinter; } }
         public ICommand CmdRemovePrinter { get { return _cmdRemovePrinter; } }
-
         public ICommand CmdAddService { get { return _cmdAddService; } }
         public ICommand CmdRemoveService { get { return _cmdRemoveService; } }
         public ICommand CmdRegSchedule { get { return _cmdRegSchedule; } }
-        //public ICommand CmdOptSchedule { get { return _cmdOptSchedule; } }
         public ICommand CmdAddMaterial { get { return _cmdAddMaterial; } }
         public ICommand CmdRemoveMaterial { get { return _cmdRemoveMaterial; } }
         public ICommand CmdSaveStuff { get { return _cmdSaveStuff; } }
 
         public MainWindowViewModel()
         {
-            using (PrinterfarmContext context = DispoAdminModel.Default.GetDBContext())
-            {
-                _listOrders = new ObservableCollection<Order>();
-                _listPrinters = new ObservableCollection<Printer>();
-                _listServices = new ObservableCollection<ServiceLogEvent>();
-                _listMaterials = new ObservableCollection<Material>();
+            //using statement for a db context holding all content for all tabs
+            PrinterfarmContext printerfarmContext = DispoAdminModel.Default.GetDBContext();
+            using PrinterfarmContext context = printerfarmContext;
 
-                _cmdViewOrder = new RelayCommand(ViewOrder, () => SelectedOrder != null);
-                _cmdAddOrder = new RelayCommand(AddOrder, () => SelectedOrder != null);
-                _cmdRemoveOrder = new RelayCommand(RemoveOrder, () => SelectedOrder != null);
-                _cmdAddPrinter = new RelayCommand(AddPrinter, () => SelectedPrinter != null);
-                _cmdRemovePrinter = new RelayCommand(RemovePrinter, () => SelectedPrinter != null);
-                _cmdAddService = new RelayCommand(AddService, () => SelectedService != null);
-                _cmdRemoveService = new RelayCommand(RemoveService, () => SelectedService != null);
-                _cmdRegSchedule = new RelayCommand(RegSchedule);
-                //_cmdOptSchedule = new RelayCommand(OptSchedule);
-                _cmdAddMaterial = new RelayCommand(AddMaterial, () => SelectedMaterial != null);
-                _cmdRemoveMaterial = new RelayCommand(RemoveMaterial, () => SelectedMaterial != null);
-                _cmdSaveStuff = new RelayCommand(SaveStuff);
+            _listOrders = new ObservableCollection<Order>();
+            _listPrinters = new ObservableCollection<Printer>();
+            _listServices = new ObservableCollection<ServiceLogEvent>();
+            _listMaterials = new ObservableCollection<Material>();
 
-                foreach (Order k in context.Orders) _listOrders.Add(k);
-                //LoadOrder();
-                foreach (Printer k in context.Printers) _listPrinters.Add(k);
-                //LoadPrinter();
-                foreach (ServiceLogEvent k in context.ServiceLogEvents) _listServices.Add(k);
-                //LoadService();
-                foreach (Material k in context.Materials) _listMaterials.Add(k);
-                //LoadMaterial();
+            _cmdViewOrder = new RelayCommand(ViewOrder, () => SelectedOrder != null);
+            _cmdAddOrder = new RelayCommand(AddOrder, () => SelectedOrder != null);
+            _cmdRemoveOrder = new RelayCommand(RemoveOrder, () => SelectedOrder != null);
+            _cmdAddPrinter = new RelayCommand(AddPrinter, () => SelectedPrinter != null);
+            _cmdRemovePrinter = new RelayCommand(RemovePrinter, () => SelectedPrinter != null);
+            _cmdAddService = new RelayCommand(AddService, () => SelectedService != null);
+            _cmdRemoveService = new RelayCommand(RemoveService, () => SelectedService != null);
+            _cmdRegSchedule = new RelayCommand(RegSchedule);
+            _cmdAddMaterial = new RelayCommand(AddMaterial, () => SelectedMaterial != null);
+            _cmdRemoveMaterial = new RelayCommand(RemoveMaterial, () => SelectedMaterial != null);
+            _cmdSaveStuff = new RelayCommand(SaveStuff);
 
-                context.SaveChanges();
-
-                void SaveStuff()
-                {
-                    //context.SaveChanges();
-                }
-            }
-        }
-
-        /*public void LoadOrder()
-        {
-            _listOrders.Clear();  
-            using (PrinterfarmContext context = DispoAdminModel.Default.GetDBContext())
-            {
-                //var result = context.Orders.Include(k => k.PrintJobs);
-                foreach (Order k in context.Orders) _listOrders.Add(k);
-            } 
-        }
-        public void LoadPrinter()
-        {
-            _listPrinters.Clear();    
-            using (PrinterfarmContext context = DispoAdminModel.Default.GetDBContext())
-            {
-                //var result = from k in context.Printers.Local orderby k.PrinterType select k;
-                foreach (Printer k in context.Printers) _listPrinters.Add(k);
-            } 
-        }
-        public void LoadService()
-        {
-            _listServices.Clear();   
-            using (PrinterfarmContext context = DispoAdminModel.Default.GetDBContext())
-            {
-                //var result = from k in context.ServiceLogEvents.Local orderby k.EventCategory select k;
-                foreach (ServiceLogEvent k in context.ServiceLogEvents) _listServices.Add(k);
-            } 
-        }
-
-        public void LoadMaterial()
-        {
-            _listMaterials.Clear();    // clear old data
-            using (PrinterfarmContext context = DispoAdminModel.Default.GetDBContext())
-            {
-                //var result = from k in context.Materials.Local orderby k.MaterialPrice select k;
-                foreach (Material k in context.Materials) _listMaterials.Add(k);
-            } 
+            foreach (Order k in context.Orders) _listOrders.Add(k);
+            foreach (Printer k in context.Printers) _listPrinters.Add(k);
+            foreach (ServiceLogEvent k in context.ServiceLogEvents) _listServices.Add(k);
+            foreach (Material k in context.Materials) _listMaterials.Add(k);
         }
 
         public void SaveStuff()
         {
-            context.SaveChanges();
-        }*/
+            PrinterfarmContext printerfarmContext = DispoAdminModel.Default.GetDBContext();
+            using PrinterfarmContext context2 = printerfarmContext;
+            
+            foreach (Order k in context2.Orders) {context2.Orders.Remove(k);}
+            foreach (Printer k in context2.Printers) context2.Printers.Remove(k);
+            foreach (ServiceLogEvent k in context2.ServiceLogEvents) context2.ServiceLogEvents.Remove(k);
+            foreach (Material k in context2.Materials) context2.Materials.Remove(k);
 
+            foreach (Order k in ListOrders) {context2.Orders.Add(k);}
+            foreach (Printer k in ListPrinters) context2.Printers.Add(k);
+            foreach (ServiceLogEvent k in ListServices) context2.ServiceLogEvents.Add(k);
+            foreach (Material k in ListMaterials) context2.Materials.Add(k);
+
+            context2.SaveChanges();
+        }
 
         public void AddOrder()
         {
-            ListOrders.Add(SelectedOrder);
+            ListOrders.Add(SelectedOrder); 
         }
 
         public void RemoveOrder()
@@ -247,24 +205,18 @@ namespace DispoAdmin.ViewModels
         {
             ListMaterials.Remove(SelectedMaterial);
         }
-
+        //Pass over to view orders window
         public void ViewOrder()
-        {            // Neues Fenster anlegen
-            // aktuell ausgewählten Kunden mitgeben
-            OrderWindow orderView = new OrderWindow(SelectedOrder);
-            orderView.ShowDialog();  // ShowDialog() => modales Dialog Fenster, MainWindow ist blockiert
+        {           
+            OrderWindow orderView = new(SelectedOrder);
+            orderView.ShowDialog();  
         }
 
+        // Pass over to schedule window
         public void RegSchedule()
-        {            // Neues Fenster anlegen            // aktuell ausgewählten Kunden mitgeben
-            DispoWindow scheduleView = new DispoWindow(scheduleWeek);
-            scheduleView.ShowDialog();  // ShowDialog() => modales Dialog Fenster, MainWindow ist blockiert
+        {           
+            DispoWindow scheduleView = new(ScheduleWeek);
+            scheduleView.ShowDialog();  
         }
-
-        /*public void OptSchedule()
-        {            // Neues Fenster anlegen            // aktuell ausgewählten Kunden mitgeben
-            DispoWindow scheduleView = new DispoWindow(scheduleWeek);
-            scheduleView.ShowDialog();  // ShowDialog() => modales Dialog Fenster, MainWindow ist blockiert
-        }*/
     }
 }

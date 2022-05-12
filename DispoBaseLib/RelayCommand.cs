@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace DispoBaseLib
@@ -20,15 +16,13 @@ namespace DispoBaseLib
 
         public RelayCommand(Action execute, Func<bool> canExecute)
         {
-            if (execute == null)
-                throw new ArgumentNullException("execute");
-            _execute = execute;
+            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
             _canExecute = canExecute;
         }
 
         public bool CanExecute(object parameter)
         {
-            return _canExecute == null ? true : _canExecute();
+            return _canExecute == null || _canExecute();
         }
 
         public void Execute(object parameter)
@@ -38,11 +32,7 @@ namespace DispoBaseLib
 
         public void RaiseCanExecuteChanged()
         {
-            var handler = CanExecuteChanged;
-            if (handler != null)
-            {
-                handler(this, EventArgs.Empty);
-            }
+            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 }

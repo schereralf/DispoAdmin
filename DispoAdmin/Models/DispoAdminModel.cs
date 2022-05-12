@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Model3DFarm;
+﻿using Model3DFarm;
 using System.Configuration;
 
 namespace DispoAdmin.Models
 {
+    // this class does admin stuff for connecting a SQL database.
     class DispoAdminModel
     {
-        private string _dbConnection;
+        private readonly string _dbConnection;
         static DispoAdminModel _instance;
 
         static DispoAdminModel()
@@ -23,7 +19,6 @@ namespace DispoAdmin.Models
         private DispoAdminModel()            // get the DB connection string
         {
             _dbConnection = ConfigurationManager.ConnectionStrings["PrinterFarm"].ConnectionString;
-            //_dbConnection = @"Data Source=DESKTOP-23QVBVH\SQLEXPRESS;Initial Catalog=PrinterFarm;Integrated Security=True";
         }
         
         public PrinterfarmContext GetDBContext()            // deliver a new DB context with connection

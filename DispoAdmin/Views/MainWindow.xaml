@@ -23,7 +23,7 @@
                         <Button Content="Remove Printer" Command="{Binding CmdRemovePrinter}" Margin="0,5"/>
                         <Button Content="SAVE" Command="{Binding CmdSaveStuff}" Margin="0,5"/>
                     </StackPanel>
-                    
+
                     <DataGrid ItemsSource="{Binding ListPrinters}" SelectedItem="{Binding SelectedPrinter}" AutoGenerateColumns="False">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Printer" Binding="{Binding PrinterType}" FontSize="10"/>
@@ -38,11 +38,11 @@
                             <DataGridTextColumn Header="Purchase Price" Binding="{Binding PrinterPurchPrice}"  />
                         </DataGrid.Columns>
                     </DataGrid>
-                    
 
                 </DockPanel>
+                
             </TabItem>
-
+            
             <TabItem Header="Orders" >
                 <DockPanel Margin="10">
                     <StackPanel DockPanel.Dock="Right" Margin="10,0,0,0">
@@ -96,9 +96,8 @@
             </TabItem>
             <TabItem Header="Schedule">
                 <StackPanel DockPanel.Dock="Right" Margin="80,50,80,80">
-                    <TextBox HorizontalAlignment="Center" Height="25" TextWrapping="Wrap"  Text="{Binding scheduleWeek}"  VerticalAlignment="Center" Width="110" />
-                    <Button Content="Original Schedule" Command="{Binding CmdRegSchedule}" Margin="0,5" />
-                    <Button Content="Optimized Schedule" Command="{Binding CmdOptSchedule}" Margin="0,5" />
+                    <TextBox HorizontalAlignment="Center" Height="25" TextWrapping="Wrap"  Text="{Binding ScheduleWeek}"  VerticalAlignment="Center" Width="110" />
+                    <Button Content="Schedule (enter week number above)" Command="{Binding CmdRegSchedule}" Margin="0,5" />
                 </StackPanel>
             </TabItem>
 
@@ -130,7 +129,6 @@
             </TabItem>
 
             <TabItem Header="Kosten und Erträge">
-
 
             </TabItem>
 

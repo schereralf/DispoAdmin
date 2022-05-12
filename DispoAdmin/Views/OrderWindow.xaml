@@ -8,25 +8,28 @@
         d:DataContext="{d:DesignInstance Type=viewmodels:OrderWindowViewModel}"
         mc:Ignorable="d"
         
-        Title="My 3D Printer Farm - Print Jobs" Height="250" Width="450">
+        Title="My 3D Printer Farm - Print Jobs" Height="300" Width="900">
     <DockPanel Margin="20">
         <StackPanel DockPanel.Dock="Right" Margin="10,0,0,0">
             <Button Content="Add PrintJob" Command="{Binding CmdAddPrintJob}" Margin="0,5" />
             <Button Content="Remove PrintJob" Command="{Binding CmdRemovePrintJob}" Margin="0,5"/>
             <Button Content="Locate + Parse" Command="{Binding CmdParsePrintJob}" Margin="0,5"/>
+            <Button Content="Save Order Details" Command="{Binding CmdSavePrintJobs}" Margin="0,5"/>
         </StackPanel>
 
         <DataGrid ItemsSource="{Binding ListPrintJobs}" SelectedItem="{Binding SelectedPrintJob}" AutoGenerateColumns="False">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Print Job Name" Binding="{Binding JobName}"/>
                 <DataGridTextColumn Header="Material" Binding="{Binding Material}"/>
-                <DataGridTextColumn Width ="30" Header="LH" Binding="{Binding LayerHeight}"/>
+                <DataGridTextColumn Header="Layers 1/100mm" Binding="{Binding LayerHeight}"/>
+                <DataGridTextColumn Header="Material, g" Binding="{Binding WeightMaterial, StringFormat={}{0:n2}}"/>
+                <DataGridTextColumn Header="PrintTime, h" Binding="{Binding PrintTime, StringFormat={}{0:n2}}"/>
                 <DataGridHyperlinkColumn Width ="240" Header="File Adress" Binding="{Binding GcodeAdresse}"/>
             </DataGrid.Columns>
         </DataGrid>
 
-        <TextBox Text="{Binding Order.CustomerName}" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.507,2.389" Height="18" Width="85" Margin="-250,-15,0,0" FontSize="9" />
-        <TextBox Text="{Binding Order.OrderName}" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.495,1.833" Height="18" Width="91" Margin="-140,-15,0,0" FontSize="9" />
+        <TextBox Text="{Binding Order.CustomerName}" HorizontalAlignment="Left" VerticalAlignment="Center" Height="20" Width="85" Margin="-630,-265,0,0" FontSize="10" />
+        <TextBox Text="{Binding Order.OrderName}" HorizontalAlignment="Left" VerticalAlignment="Center" Height="20" Width="91" Margin="-530,-265,0,0" FontSize="10" />
     </DockPanel>
 
 </Window>

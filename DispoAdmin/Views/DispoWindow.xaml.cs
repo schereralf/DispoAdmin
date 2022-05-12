@@ -1,38 +1,147 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
+using DispoAdmin.Models;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using Model3DFarm;
-using DispoAdmin.ViewModels;
-using DispoAdmin.Scheduler;
 using System.Reflection;
+using System.Collections.ObjectModel;
 
 namespace DispoAdmin.Views
 {
     /// <summary>
-    /// Interaktionslogik für DispoWindow.xaml
+    /// Interaction logic für DispoWindow.xaml
     /// </summary>
     public partial class DispoWindow : Window
     {
+        public int ScheduleWeek;
+
+        private ObservableCollection<Schedule> _listSchedules;
+        public IList<Schedule> ListSchedules => _listSchedules;
+        List<Printer> ListPrinters= new List<Printer>();
+
+        private Schedule _selectedSchedule;
+
+        public Schedule SelectedSchedule
+        {
+            get { return _selectedSchedule; }
+            set
+            {
+                _selectedSchedule = value;
+            }
+        }
+
+        List<Button> Controls = new List<Button>();
+        private int jobPosition;
+
         public DispoWindow(int scheduleWeek)
         {
             InitializeComponent();
-            this.DataContext = new DispoWindowViewModel(scheduleWeek);        
-        }
 
-        private DispoWindowViewModel ViewModel
+            this.ScheduleWeek = scheduleWeek;
+            DateTime dayDateStart = new DateTime(2022, 1, 3);
+
+            int NewDate = (scheduleWeek - 1) * 7;
+
+            using (PrinterfarmContext context = DispoAdminModel.Default.GetDBContext())
+            {
+                ListPrinters.Clear();
+
+                _listSchedules = new ObservableCollection<Schedule>();
+
+                foreach (Printer k in context.Printers) ListPrinters.Add(k);
+
+                for (int i = 0; i < ListPrinters.Count; i++)
+                {
+                    TextBox t = new TextBox();
+                    t.Text = ListPrinters[i].PrinterType;
+                    Grid.SetRow(t, i * 2+1);
+                    Grid.SetColumnSpan(t, 167);
+                    t.Background = PickBrush(3);
+                    t.HorizontalAlignment = HorizontalAlignment.Left;
+                    t.Width = 2000;
+                    Dispogrid.Children.Add(t);
+                }
+
+                    var result = from k in context.Schedules
+                             where k.ScheduleWeek == this.ScheduleWeek
+                             orderby k.TimeStart
+                             select k;
+
+                foreach (Schedule k in result)
+                {
+                    ListSchedules.Add(k);
+                }
+
+                Random rnd = new Random();
+                jobPosition = 0;
+
+                for (int i = 0; i < ListSchedules.Count; i++)
+                {
+                    ExtendedButton b = new ExtendedButton();
+                    // unique MessageBox used here operates with ExtendedButton
+
+                    b._myval = ListSchedules[i].PrintJob.JobName.ToString() + " " + ListSchedules[i].PrintJob.JobOrder.ToString() + " " 
+                        + ListSchedules[i].PrintJob.Material.ToString();
+                    //this assigns some job details to the extended button
+
+                    b.Click += new RoutedEventHandler(OnButtonClick);
+                    this.Controls.Add(b);
+                    DeButnPlace(b, i, 2);
+                    Dispogrid.Children.Add(b);
+                }
+
+                context.SaveChanges();
+
+                void DeButnPlace(Button thisButton, int j, int row)
+                {
+                    int jobRun = (int)Math.Ceiling((decimal)ListSchedules[j].MR_Time + (decimal)ListSchedules[j].RO_Time);
+
+                    TimeSpan startTime = (TimeSpan)(ListSchedules[j].TimeStart - new DateTime(2022, 1, 1));
+                    int days = (int)startTime.TotalDays - 1;
+                    DateTime schedHour = (DateTime)ListSchedules[j].TimeStart;
+                    int hours = (int)schedHour.TimeOfDay.TotalHours;
+
+                    jobPosition = (days - ((int)ListSchedules[j].ScheduleWeek - 1) * 7) * 24 + hours;
+
+                    Grid.SetRow(thisButton, row);
+                    Grid.SetColumn(thisButton, jobPosition);
+                    Grid.SetColumnSpan(thisButton, jobRun);
+                    thisButton.Background = PickBrush(rnd.Next(20));
+                    thisButton.Content = ListSchedules[j].PrintJob.JobName;
+                    // each job position will eventually be calculated by an optimization routine based on length, dimensions, material etc. 
+                }
+
+                void OnButtonClick(object sender, EventArgs e)
+                {
+                    string jobName = ((ExtendedButton)sender)._myval;
+                    MessageBox.Show(jobName);
+                }
+
+                Brush PickBrush(int random)
+                {
+                    Brush result = Brushes.Transparent;
+                    Type brushesType = typeof(Brushes);
+                    PropertyInfo[] properties = brushesType.GetProperties();
+                    result = (Brush)properties[random].GetValue(null, null);
+                    return result;
+                }
+            }
+    }
+        class ExtendedButton : Button //this class inherits from button
         {
-            get { return (DispoWindowViewModel)this.DataContext; }
-        }
+            //constructor
+            public ExtendedButton()
+            { }
 
+            private string myval;
+            public string _myval
+            {
+                get { return myval; }
+                set { myval = value; }
+            }
+        }
     }
 }
