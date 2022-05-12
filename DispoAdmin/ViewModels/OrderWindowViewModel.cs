@@ -2,13 +2,10 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Model3DFarm;
 using DispoBaseLib;
 using System.Windows.Input;
 using DispoAdmin.Models;
-using Microsoft.EntityFrameworkCore;
 using System.IO;
 using Microsoft.Win32;
 
@@ -26,17 +23,16 @@ namespace DispoAdmin.ViewModels
                 _order = value;
             }
         }
-        private ObservableCollection<PrintJob> _listPrintJobs;
+        private readonly ObservableCollection<PrintJob> _listPrintJobs;
         public IList<PrintJob> ListPrintJobs => _listPrintJobs;
 
         private PrintJob _selectedPrintJob;
         private string gcodeText;
-        private string gcodeName;
         private int layerheight;
         private int prusastart;
         public PrintJob SelectedPrintJob
         {
-
+			//in addition to add, remove and save print jobs in an order, a fourth option called
 			//ParsePrintJob contains code for extracting data from Gcode files
 
             get { return _selectedPrintJob; }
@@ -47,16 +43,20 @@ namespace DispoAdmin.ViewModels
                 _cmdAddPrintJob.RaiseCanExecuteChanged();
                 _cmdRemovePrintJob.RaiseCanExecuteChanged();
                 _cmdParsePrintJob.RaiseCanExecuteChanged();
+				_cmdSavePrintJobs.RaiseCanExecuteChanged();
             }
         }
 
-        RelayCommand _cmdAddPrintJob;
-        RelayCommand _cmdRemovePrintJob;
-        RelayCommand _cmdParsePrintJob;
+        private readonly RelayCommand _cmdAddPrintJob;
+        private readonly RelayCommand _cmdRemovePrintJob;
+        private readonly RelayCommand _cmdParsePrintJob;
+		private readonly RelayCommand _cmdSavePrintJobs;
 
-        public ICommand CmdAddPrintJob { get { return _cmdAddPrintJob; } }
+		public ICommand CmdAddPrintJob { get { return _cmdAddPrintJob; } }
         public ICommand CmdRemovePrintJob { get { return _cmdRemovePrintJob; } }
         public ICommand CmdParsePrintJob { get { return _cmdParsePrintJob; } }
+		public ICommand CmdSavePrintJobs { get { return _cmdSavePrintJobs; } }
+
 		// Konstruktor mit Parameter
 		public OrderWindowViewModel(Order order)
 		{
@@ -67,9 +67,9 @@ namespace DispoAdmin.ViewModels
 			_cmdAddPrintJob = new RelayCommand(AddPrintJob, () => SelectedPrintJob != null);
 			_cmdRemovePrintJob = new RelayCommand(RemovePrintJob, () => SelectedPrintJob != null);
 			_cmdParsePrintJob = new RelayCommand(ParsePrintJob, () => SelectedPrintJob != null);
+			_cmdSavePrintJobs = new RelayCommand(SavePrintJobs);
 
-
-			using (PrinterfarmContext context = DispoAdminModel.Default.GetDBContext())
+			using PrinterfarmContext context = DispoAdminModel.Default.GetDBContext();
 			{
 				var result = from k in context.PrintJobs
 							 where k.Order == this.Order
@@ -79,10 +79,33 @@ namespace DispoAdmin.ViewModels
 				{
 					_listPrintJobs.Add(k);
 				}
-
-					context.SaveChanges();
 			}
 		}
+
+		public void SavePrintJobs()
+        {
+			using PrinterfarmContext context2 = DispoAdminModel.Default.GetDBContext();
+
+			var result1 = from k in context2.PrintJobs
+						 where k.Order == this.Order
+						 orderby k.JobName
+						 select k;
+			foreach (PrintJob k in result1)
+			{
+				context2.PrintJobs.Remove(k);
+			}
+
+			var result2 = from k in ListPrintJobs
+						 //where k.Order == this.Order
+						 orderby k.JobName
+						 select k;
+			foreach (PrintJob k in result2)
+			{
+				context2.PrintJobs.Add(k);
+			}
+			context2.SaveChanges();
+		}
+
         public void AddPrintJob()
         {
             ListPrintJobs.Add(SelectedPrintJob);
@@ -94,8 +117,8 @@ namespace DispoAdmin.ViewModels
         }
         public void ParsePrintJob()
         {
-			using (PrinterfarmContext context = DispoAdminModel.Default.GetDBContext())
-			{
+			//using (PrinterfarmContext context3 = DispoAdminModel.Default.GetDBContext())
+			//{
 				
 				// Window for selecting gcode files for data extraction
 				// Three slicer+printer combinations possible now
@@ -103,32 +126,30 @@ namespace DispoAdmin.ViewModels
 				// 2. PrusaSlicer and Prusa Mini
 				// 3. PrusaSlicer and Ender 3
 
-				OpenFileDialog openFileDialog = new OpenFileDialog();
+				OpenFileDialog openFileDialog = new();
 				openFileDialog.InitialDirectory = @"C:\Alf\Wifi_Coursework\GcodeFiles";
 				openFileDialog.Filter = "Gcode files (*.gcode)|*.gcode|All files (*.*)|*.*";
 
 				if (openFileDialog.ShowDialog() == true)
-					SelectedPrintJob.GcodeAdresse = openFileDialog.FileName;
+					SelectedPrintJob.GcodeAdresse = openFileDialog.FileName[..25];
 
 				string[] gcodeLines = File.ReadAllLines(openFileDialog.FileName);
 
 				gcodeText = File.ReadAllText(openFileDialog.FileName);
-				gcodeName = openFileDialog.FileName;
-
 
 				// first combination
 
 				if (gcodeText.Contains("UltiGCode") && gcodeText.Contains("Cura_SteamEngine"))
 				{
-					string printtimetxt = gcodeLines[1].Substring(gcodeLines[1].IndexOf(":") + 1);
+					string printtimetxt = gcodeLines[1][(gcodeLines[1].IndexOf(":") + 1)..];
 					float printtime = (float)Int32.Parse(printtimetxt) / 3600;
 					SelectedPrintJob.PrintTime = (double)printtime;
 
-					string nozzletxt = gcodeLines[4].Substring(gcodeLines[4].IndexOf(":") + 1);
+					string nozzletxt = gcodeLines[4][(gcodeLines[4].IndexOf(":") + 1)..];
 					float nozzle = float.Parse(nozzletxt, System.Globalization.CultureInfo.InvariantCulture);
 					SelectedPrintJob.NozzleDiam_mm = (int)nozzle;
 
-					string weightmaterialtxt = gcodeLines[2].Substring(gcodeLines[2].IndexOf(":") + 1);
+					string weightmaterialtxt = gcodeLines[2][(gcodeLines[2].IndexOf(":") + 1)..];
 					float weightmaterial = (float)Int32.Parse(weightmaterialtxt) / 1000;
 					SelectedPrintJob.WeightMaterial = (double)weightmaterial;
 
@@ -153,15 +174,15 @@ namespace DispoAdmin.ViewModels
 
 				// Second combination
 
-				if (gcodeText.Contains("PrusaSlicer") && gcodeText.Contains("MINI"))
+				else if (gcodeText.Contains("PrusaSlicer") && gcodeText.Contains("MINI"))
 				{
 					for (int i = 0; i < gcodeLines.Length; i++) if (gcodeLines[i].Contains("filament used [mm]")) prusastart = i;
 
 					string printtimetxt = gcodeLines[prusastart + 6].Substring(gcodeLines[prusastart + 6].IndexOf("= ") + 1);
 					string hourstxt = printtimetxt.Substring(0, printtimetxt.IndexOf("h"));
-					string minstxt = printtimetxt.Substring(printtimetxt.IndexOf("h"), printtimetxt.IndexOf("m") - printtimetxt.IndexOf("h"));
-					string secstxt = printtimetxt.Substring(printtimetxt.IndexOf("m"), printtimetxt.IndexOf("s") - printtimetxt.IndexOf("m"));
-					SelectedPrintJob.PrintTime = (double)(Int32.Parse(hourstxt) + (float)Int32.Parse(minstxt) / 60 + (float)Int32.Parse(minstxt) / 3600);
+					string minstxt = printtimetxt.Substring(printtimetxt.IndexOf("h")+1, printtimetxt.IndexOf("m") - printtimetxt.IndexOf("h")-1);
+					string secstxt = printtimetxt.Substring(printtimetxt.IndexOf("m")+1, printtimetxt.IndexOf("s") - printtimetxt.IndexOf("m")-1);
+					SelectedPrintJob.PrintTime = (double)(Int32.Parse(hourstxt) + (float)Int32.Parse(minstxt) / 60 + (float)Int32.Parse(secstxt) / 3600);
 
 					string nozzletxt = gcodeLines[prusastart + 58].Substring(gcodeLines[prusastart + 58].IndexOf("= ") + 1);
 					float nozzle = float.Parse(nozzletxt, System.Globalization.CultureInfo.InvariantCulture);
@@ -172,7 +193,7 @@ namespace DispoAdmin.ViewModels
 					SelectedPrintJob.WeightMaterial = (double)weightmaterial;
 
 					string layertxt = gcodeLines[prusastart + 124].Substring(gcodeLines[prusastart + 124].IndexOf("= ") + 1);
-					float layerheight = float.Parse(layertxt, System.Globalization.CultureInfo.InvariantCulture);
+					float layerheight = 100*float.Parse(layertxt, System.Globalization.CultureInfo.InvariantCulture);
 					SelectedPrintJob.LayerHeight = (int)layerheight;
 
 					int volx = 180;
@@ -187,15 +208,15 @@ namespace DispoAdmin.ViewModels
 
 				// Third combination
 
-				if (gcodeText.Contains("PrusaSlicer") && gcodeText.Contains("ENDER3"))
+				else if (gcodeText.Contains("PrusaSlicer") && gcodeText.Contains("ENDER3"))
 				{
 					for (int i = 0; i < gcodeLines.Length; i++) if (gcodeLines[i].Contains("filament used [mm]")) prusastart = i;
 
 					string printtimetxt = gcodeLines[prusastart + 6].Substring(gcodeLines[prusastart + 6].IndexOf("= ") + 1);
 					string hourstxt = printtimetxt.Substring(0, printtimetxt.IndexOf("h"));
-					string minstxt = printtimetxt.Substring(printtimetxt.IndexOf("h"), printtimetxt.IndexOf("m") - printtimetxt.IndexOf("h"));
-					string secstxt = printtimetxt.Substring(printtimetxt.IndexOf("m"), printtimetxt.IndexOf("s") - printtimetxt.IndexOf("m"));
-					SelectedPrintJob.PrintTime = (double)(Int32.Parse(hourstxt) + (float)Int32.Parse(minstxt) / 60 + (float)Int32.Parse(minstxt) / 3600);
+					string minstxt = printtimetxt.Substring(printtimetxt.IndexOf("h") + 1, printtimetxt.IndexOf("m") - printtimetxt.IndexOf("h") - 1);
+					string secstxt = printtimetxt.Substring(printtimetxt.IndexOf("m") + 1, printtimetxt.IndexOf("s") - printtimetxt.IndexOf("m") - 1);
+					SelectedPrintJob.PrintTime = (double)(Int32.Parse(hourstxt) + (float)Int32.Parse(minstxt) / 60 + (float)Int32.Parse(secstxt) / 3600);
 
 					string nozzletxt = gcodeLines[prusastart + 58].Substring(gcodeLines[prusastart + 58].IndexOf("= ") + 1);
 					float nozzle = float.Parse(nozzletxt, System.Globalization.CultureInfo.InvariantCulture);
@@ -206,7 +227,7 @@ namespace DispoAdmin.ViewModels
 					SelectedPrintJob.WeightMaterial = (double)weightmaterial;
 
 					string layertxt = gcodeLines[prusastart + 124].Substring(gcodeLines[prusastart + 124].IndexOf("= ") + 1);
-					float layerheight = float.Parse(layertxt, System.Globalization.CultureInfo.InvariantCulture);
+					float layerheight = 100*float.Parse(layertxt, System.Globalization.CultureInfo.InvariantCulture);
 					SelectedPrintJob.LayerHeight = (int)layerheight;
 
 					int volx = 228;
@@ -218,8 +239,8 @@ namespace DispoAdmin.ViewModels
 					int volz = 228;
 					SelectedPrintJob.VolZ = volz;
 				}
-			}
-        }        
+				else throw new Exception("This printer has not yet been included");
+			}        
     }
 }
 

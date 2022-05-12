@@ -1,16 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
+﻿
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using DispoBaseLib;
 using Model3DFarm;
 using DispoAdmin.Models;
 using DispoAdmin.Views;
 using System.Windows.Input;
-using System.IO;
 
 namespace DispoAdmin.ViewModels
 {
@@ -18,10 +13,10 @@ namespace DispoAdmin.ViewModels
     {
         //Setup Observable Collections and Items Lists  for each tab
 
-        private ObservableCollection<Order> _listOrders;
-        private ObservableCollection<Printer> _listPrinters;
-        private ObservableCollection<ServiceLogEvent> _listServices;
-        private ObservableCollection<Material> _listMaterials;
+        private readonly ObservableCollection<Order> _listOrders;
+        private readonly ObservableCollection<Printer> _listPrinters;
+        private readonly ObservableCollection<ServiceLogEvent> _listServices;
+        private readonly ObservableCollection<Material> _listMaterials;
 
         public IList<Order> ListOrders => _listOrders;
         public IList<Printer> ListPrinters => _listPrinters;
@@ -35,15 +30,15 @@ namespace DispoAdmin.ViewModels
         private int _scheduleWeek;
 
         //Setup line selection and button actions
+        //Order tab contains button to open jobs listing in "OrderWindow" window for selected order
 
-        // Order tab contains button to open jobs listing in "OrderWindow" window for selected order
         public Order SelectedOrder
         {    // for binding
             get { return _selectedOrder; }
             set
             {
                 _selectedOrder = value;
-                OnPropertyChanged();               
+                OnPropertyChanged();
                 _cmdViewOrder.RaiseCanExecuteChanged();
                 _cmdAddOrder.RaiseCanExecuteChanged();
                 _cmdRemoveOrder.RaiseCanExecuteChanged();
@@ -64,7 +59,7 @@ namespace DispoAdmin.ViewModels
         }
         // Scheduler tab needs only field to specify week and the window start button 
         public int ScheduleWeek
-        {   
+        {
             get { return _scheduleWeek; }
             set
             {
@@ -75,7 +70,7 @@ namespace DispoAdmin.ViewModels
         }
 
         public ServiceLogEvent SelectedService
-        {   
+        {
             get { return _selectedService; }
             set
             {
@@ -100,17 +95,17 @@ namespace DispoAdmin.ViewModels
             }
         }
 
-        RelayCommand _cmdViewOrder;
-        RelayCommand _cmdAddOrder;
-        RelayCommand _cmdRemoveOrder;
-        RelayCommand _cmdAddPrinter;
-        RelayCommand _cmdRemovePrinter;
-        RelayCommand _cmdAddService;
-        RelayCommand _cmdRemoveService;
-        RelayCommand _cmdRegSchedule;
-        RelayCommand _cmdAddMaterial;
-        RelayCommand _cmdRemoveMaterial;
-        RelayCommand _cmdSaveStuff;
+        readonly RelayCommand _cmdViewOrder;
+        readonly RelayCommand _cmdAddOrder;
+        readonly RelayCommand _cmdRemoveOrder;
+        readonly RelayCommand _cmdAddPrinter;
+        readonly RelayCommand _cmdRemovePrinter;
+        readonly RelayCommand _cmdAddService;
+        readonly RelayCommand _cmdRemoveService;
+        readonly RelayCommand _cmdRegSchedule;
+        readonly RelayCommand _cmdAddMaterial;
+        readonly RelayCommand _cmdRemoveMaterial;
+        readonly RelayCommand _cmdSaveStuff;
 
         public ICommand CmdViewOrder { get { return _cmdViewOrder; } }
         public ICommand CmdAddOrder { get { return _cmdAddOrder; } }
@@ -126,45 +121,54 @@ namespace DispoAdmin.ViewModels
 
         public MainWindowViewModel()
         {
-            //using statement for a db context holding all content for all tabs -- does this at all make sense ??
+            //using statement for a db context holding all content for all tabs
+            PrinterfarmContext printerfarmContext = DispoAdminModel.Default.GetDBContext();
+            using PrinterfarmContext context = printerfarmContext;
 
-            using (PrinterfarmContext context = DispoAdminModel.Default.GetDBContext())
-            {
-                _listOrders = new ObservableCollection<Order>();
-                _listPrinters = new ObservableCollection<Printer>();
-                _listServices = new ObservableCollection<ServiceLogEvent>();
-                _listMaterials = new ObservableCollection<Material>();
+            _listOrders = new ObservableCollection<Order>();
+            _listPrinters = new ObservableCollection<Printer>();
+            _listServices = new ObservableCollection<ServiceLogEvent>();
+            _listMaterials = new ObservableCollection<Material>();
 
-                _cmdViewOrder = new RelayCommand(ViewOrder, () => SelectedOrder != null);
-                _cmdAddOrder = new RelayCommand(AddOrder, () => SelectedOrder != null);
-                _cmdRemoveOrder = new RelayCommand(RemoveOrder, () => SelectedOrder != null);
-                _cmdAddPrinter = new RelayCommand(AddPrinter, () => SelectedPrinter != null);
-                _cmdRemovePrinter = new RelayCommand(RemovePrinter, () => SelectedPrinter != null);
-                _cmdAddService = new RelayCommand(AddService, () => SelectedService != null);
-                _cmdRemoveService = new RelayCommand(RemoveService, () => SelectedService != null);
-                _cmdRegSchedule = new RelayCommand(RegSchedule);
-                _cmdAddMaterial = new RelayCommand(AddMaterial, () => SelectedMaterial != null);
-                _cmdRemoveMaterial = new RelayCommand(RemoveMaterial, () => SelectedMaterial != null);
-                _cmdSaveStuff = new RelayCommand(SaveStuff);
+            _cmdViewOrder = new RelayCommand(ViewOrder, () => SelectedOrder != null);
+            _cmdAddOrder = new RelayCommand(AddOrder, () => SelectedOrder != null);
+            _cmdRemoveOrder = new RelayCommand(RemoveOrder, () => SelectedOrder != null);
+            _cmdAddPrinter = new RelayCommand(AddPrinter, () => SelectedPrinter != null);
+            _cmdRemovePrinter = new RelayCommand(RemovePrinter, () => SelectedPrinter != null);
+            _cmdAddService = new RelayCommand(AddService, () => SelectedService != null);
+            _cmdRemoveService = new RelayCommand(RemoveService, () => SelectedService != null);
+            _cmdRegSchedule = new RelayCommand(RegSchedule);
+            _cmdAddMaterial = new RelayCommand(AddMaterial, () => SelectedMaterial != null);
+            _cmdRemoveMaterial = new RelayCommand(RemoveMaterial, () => SelectedMaterial != null);
+            _cmdSaveStuff = new RelayCommand(SaveStuff);
 
-                foreach (Order k in context.Orders) _listOrders.Add(k);
-                foreach (Printer k in context.Printers) _listPrinters.Add(k);
-                foreach (ServiceLogEvent k in context.ServiceLogEvents) _listServices.Add(k);
-                foreach (Material k in context.Materials) _listMaterials.Add(k);;
+            foreach (Order k in context.Orders) _listOrders.Add(k);
+            foreach (Printer k in context.Printers) _listPrinters.Add(k);
+            foreach (ServiceLogEvent k in context.ServiceLogEvents) _listServices.Add(k);
+            foreach (Material k in context.Materials) _listMaterials.Add(k);
+        }
 
+        public void SaveStuff()
+        {
+            PrinterfarmContext printerfarmContext = DispoAdminModel.Default.GetDBContext();
+            using PrinterfarmContext context2 = printerfarmContext;
+            
+            foreach (Order k in context2.Orders) {context2.Orders.Remove(k);}
+            foreach (Printer k in context2.Printers) context2.Printers.Remove(k);
+            foreach (ServiceLogEvent k in context2.ServiceLogEvents) context2.ServiceLogEvents.Remove(k);
+            foreach (Material k in context2.Materials) context2.Materials.Remove(k);
 
-                context.SaveChanges();
+            foreach (Order k in ListOrders) {context2.Orders.Add(k);}
+            foreach (Printer k in ListPrinters) context2.Printers.Add(k);
+            foreach (ServiceLogEvent k in ListServices) context2.ServiceLogEvents.Add(k);
+            foreach (Material k in ListMaterials) context2.Materials.Add(k);
 
-                // A Saving button should be redundant when using ObservableCollection ??
-                void SaveStuff()
-                {      
-                }
-            }
+            context2.SaveChanges();
         }
 
         public void AddOrder()
         {
-            ListOrders.Add(SelectedOrder);
+            ListOrders.Add(SelectedOrder); 
         }
 
         public void RemoveOrder()
@@ -204,14 +208,14 @@ namespace DispoAdmin.ViewModels
         //Pass over to view orders window
         public void ViewOrder()
         {           
-            OrderWindow orderView = new OrderWindow(SelectedOrder);
+            OrderWindow orderView = new(SelectedOrder);
             orderView.ShowDialog();  
         }
 
         // Pass over to schedule window
         public void RegSchedule()
         {           
-            DispoWindow scheduleView = new DispoWindow(ScheduleWeek);
+            DispoWindow scheduleView = new(ScheduleWeek);
             scheduleView.ShowDialog();  
         }
     }

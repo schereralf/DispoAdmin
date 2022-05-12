@@ -13,7 +13,6 @@ namespace Model3DFarm
         string _dbConnection;
         public PrinterfarmContext()
         {
-
         }
 
         public PrinterfarmContext(string dbConnection)

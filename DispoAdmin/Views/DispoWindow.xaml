@@ -211,7 +211,5 @@
         <TextBox Grid.Row="0" Grid.Column="120" Grid.ColumnSpan="24" Text="Saturday" HorizontalAlignment="Center" VerticalAlignment="Center"  BorderThickness="2"/>
         <TextBox Grid.Row="0" Grid.Column="144" Grid.ColumnSpan="24" Text="Sunday" HorizontalAlignment="Center" VerticalAlignment="Center"  BorderThickness="2"/>
 
-       
-
     </Grid>
 </Window>
