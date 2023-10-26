@@ -17,19 +17,21 @@ namespace Model3DFarm
 
         [Key]
         public int OrderID { get; set; }
+
         [Required]
-        [StringLength(30)]
+        [StringLength(50)]
         public string CustomerName { get; set; }
+
         [Required]
-        [StringLength(30)]
+        [StringLength(50)]
         public string OrderName { get; set; }
         public double OrderPrice { get; set; }
+        
         [Column(TypeName = "DateTime")]
         public DateTime? DateIn { get; set; }
+        
         [Column(TypeName = "DateTime")]
         public DateTime? DateDue { get; set; }
-
-        [InverseProperty(nameof(PrintJob.Order))]
         public virtual ICollection<PrintJob> PrintJobs { get; set; }
     }
 }

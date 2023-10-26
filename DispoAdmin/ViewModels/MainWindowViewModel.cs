@@ -168,6 +168,7 @@ namespace DispoAdmin.ViewModels
 
         public void AddOrder()
         {
+            // TODO: include exception for when order due dates erroneoisly are <= the file dates !
             ListOrders.Add(SelectedOrder); 
         }
 

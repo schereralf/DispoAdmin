@@ -13,21 +13,25 @@ namespace Model3DFarm
     {
         [Key]
         public int JobScheduleID { get; set; }
-        public int PrintJobID { get; set; }
+        //public int PrintJobID { get; set; }
         public int PrinterID { get; set; }
+
+        public int PrintJobID { get; set; }
 
         [Column(TypeName = "DateTime")]
         public DateTime? TimeStart { get; set; }
+
+        public DateTime? TimeEnd { get; set; }
+
         public double? MR_Time { get; set; }
         public double? RO_Time { get; set; }
         
         public int? ScheduleWeek { get; set; }
 
         [ForeignKey(nameof(PrintJobID))]
-        [InverseProperty("Schedules")]
         public virtual PrintJob PrintJob { get; set; }
+
         [ForeignKey(nameof(PrinterID))]
-        [InverseProperty("Schedules")]
         public virtual Printer Printer { get; set; }
     }
 }

@@ -66,7 +66,7 @@ namespace Model3DFarm
 
                 entity.Property(e => e.JobName).IsFixedLength(true);
 
-                entity.Property(e => e.JobOrder).IsFixedLength(true);
+                //entity.Property(e => e.JobOrder).IsFixedLength(true);
 
                 entity.Property(e => e.Material).IsFixedLength(true);
 
@@ -112,8 +112,8 @@ namespace Model3DFarm
             modelBuilder.Entity<Schedule>(entity =>
             {
                 entity.HasOne(d => d.PrintJob)
-                    .WithMany(p => p.Schedules)
-                    .HasForeignKey(d => d.PrintJobID)
+                    .WithOne(p => p.PrintSchedule)
+                    //.HasForeignKey()
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Schedule_PrintJobs");
 

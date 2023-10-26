@@ -17,19 +17,20 @@
             <Button Content="Save Order Details" Command="{Binding CmdSavePrintJobs}" Margin="0,5"/>
         </StackPanel>
 
-        <DataGrid ItemsSource="{Binding ListPrintJobs}" SelectedItem="{Binding SelectedPrintJob}" AutoGenerateColumns="False">
+        <TextBox Text="{Binding Order.CustomerName}" HorizontalAlignment="Left" VerticalAlignment="Top" Height="20" Width="85" Margin="5,0" FontSize="10" />
+        <TextBox Text="{Binding Order.OrderName}" HorizontalAlignment="Left" VerticalAlignment="Top" Height="20" Width="85" Margin="5,0" FontSize="10" />
+
+        <DataGrid ItemsSource="{Binding ListPrintJobs}" SelectedItem="{Binding SelectedPrintJob}" AutoGenerateColumns="False" Margin="-185,35,0,0">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Print Job Name" Binding="{Binding JobName}"/>
-                <DataGridTextColumn Header="Material" Binding="{Binding Material}"/>
-                <DataGridTextColumn Header="Layers 1/100mm" Binding="{Binding LayerHeight}"/>
-                <DataGridTextColumn Header="Material, g" Binding="{Binding WeightMaterial, StringFormat={}{0:n2}}"/>
-                <DataGridTextColumn Header="PrintTime, h" Binding="{Binding PrintTime, StringFormat={}{0:n2}}"/>
-                <DataGridHyperlinkColumn Width ="240" Header="File Adress" Binding="{Binding GcodeAdresse}"/>
+                <DataGridTextColumn Header="Print Job Name" Binding="{Binding JobName}" Width="auto"/>
+                <DataGridTextColumn Header="Material" Binding="{Binding Material}" Width="auto"/>
+                <DataGridTextColumn Header="Layers, 0.01mm" Binding="{Binding LayerHeight}" Width="auto"/>
+                <DataGridTextColumn Header="Material, g" Binding="{Binding WeightMaterial, StringFormat={}{0:n2}}" Width="auto"/>
+                <DataGridTextColumn Header="PrintTime, h" Binding="{Binding PrintTime, StringFormat={}{0:n2}}" Width="auto"/>
+                <DataGridHyperlinkColumn Header="File Adress" Binding="{Binding GcodeAdresse}" Width="250"/>
             </DataGrid.Columns>
         </DataGrid>
 
-        <TextBox Text="{Binding Order.CustomerName}" HorizontalAlignment="Left" VerticalAlignment="Center" Height="20" Width="85" Margin="-630,-265,0,0" FontSize="10" />
-        <TextBox Text="{Binding Order.OrderName}" HorizontalAlignment="Left" VerticalAlignment="Center" Height="20" Width="91" Margin="-530,-265,0,0" FontSize="10" />
     </DockPanel>
 
 </Window>
