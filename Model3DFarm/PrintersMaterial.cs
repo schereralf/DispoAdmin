@@ -16,6 +16,7 @@ namespace Model3DFarm
 
         [ForeignKey(nameof(PMMaterialsFK))]
         public virtual Material PMMaterialsFKNavigation { get; set; }
+
         [ForeignKey(nameof(PMPrintersFK))]
         public virtual Printer PMPrintersFKNavigation { get; set; }
     }

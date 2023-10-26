@@ -18,14 +18,12 @@ namespace Model3DFarm
         [Key]
         public int PrinterID { get; set; }
         [Required]
-        [StringLength(10)]
+        [StringLength(20)]
         public string PrinterType { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? PrinterPurchDate { get; set; }
         public double PrinterPurchPrice { get; set; }
         public double? ServiceTimeEst { get; set; }
-
-        [InverseProperty(nameof(Schedule.Printer))]
         public virtual ICollection<Schedule> Schedules { get; set; }
     }
 }

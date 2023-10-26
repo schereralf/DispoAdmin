@@ -12,34 +12,40 @@ namespace Model3DFarm
     {
         public PrintJob()
         {
-            Schedules = new HashSet<Schedule>();
+            //Schedules = new HashSet<Schedule>();
+            Schedule PrintSchedule = new();
         }
 
         [Key]
         public int JobID { get; set; }
         [Required]
-        [StringLength(30)]
+
+        [StringLength(50)]
         public string JobName { get; set; }
-        [StringLength(30)]
-        public string JobOrder { get; set; }
+        public int? OrderID { get; set; }
+
+        [ForeignKey(nameof(OrderID))]
+        public virtual Order Order { get; set; }
+
         [StringLength(3)]
         public string Material { get; set; }
         public double? WeightMaterial { get; set; }
-        public int? NozzleDiam_mm { get; set; }
+        public double? NozzleDiam_mm { get; set; }
         public int? LayerHeight { get; set; }
         public int? VolX { get; set; }
         public int? VolY { get; set; }
         public int? VolZ { get; set; }
 
-        [StringLength(30)]
+        public int PrinterType { get; set; }
+
+        [StringLength(200)]
         public string GcodeAdresse { get; set; }
-        public int? OrderID { get; set; }
+
         public double? PrintTime { get; set; }
 
-        [ForeignKey(nameof(OrderID))]
-        [InverseProperty("PrintJobs")]
-        public virtual Order Order { get; set; }
-        [InverseProperty(nameof(Schedule.PrintJob))]
-        public virtual ICollection<Schedule> Schedules { get; set; }
+
+        [ForeignKey(nameof(JobID))]
+
+        public virtual Schedule PrintSchedule{ get; set; }
     }
 }

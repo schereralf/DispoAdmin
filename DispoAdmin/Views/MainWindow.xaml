@@ -26,16 +26,16 @@
 
                     <DataGrid ItemsSource="{Binding ListPrinters}" SelectedItem="{Binding SelectedPrinter}" AutoGenerateColumns="False">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Printer" Binding="{Binding PrinterType}" FontSize="10"/>
-                            <DataGridTextColumn Header="ServiceTime" Binding="{Binding ServiceTimeEst}"   />
-                            <DataGridTemplateColumn Header="Purchase Date">
+                            <DataGridTextColumn Header="Printer" Binding="{Binding PrinterType}" FontSize="10" Width="auto"/>
+                            <DataGridTextColumn Header="ServiceTime" Binding="{Binding ServiceTimeEst}"   Width="auto" />
+                            <DataGridTemplateColumn Header="Purchase Date" Width="auto">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <DatePicker SelectedDate="{Binding PrinterPurchDate}" BorderThickness="0" />
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="Purchase Price" Binding="{Binding PrinterPurchPrice}"  />
+                            <DataGridTextColumn Header="Purchase Price" Binding="{Binding PrinterPurchPrice}"  Width="auto" />
                         </DataGrid.Columns>
                     </DataGrid>
 
@@ -56,23 +56,33 @@
                     <DataGrid ItemsSource="{Binding ListOrders}" SelectedItem="{Binding SelectedOrder}" AutoGenerateColumns="False">
                         <DataGrid.Columns>
 
-                            <DataGridTextColumn Header="Customer" Binding="{Binding CustomerName}" />
-                            <DataGridTextColumn Header="Order" Binding="{Binding OrderName}"   />
-                            <DataGridTemplateColumn Header="Date In">
+                            <DataGridTextColumn Header="Customer" Binding="{Binding CustomerName}" Width="auto" />
+                            <DataGridTextColumn Header="Order" Binding="{Binding OrderName}"  Width="auto"  />
+                            <DataGridTemplateColumn Header="Date In" Width="auto" >
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <DatePicker SelectedDate="{Binding DateIn}" BorderThickness="0" />
+                                        <DatePicker SelectedDate="{Binding DateIn}" BorderThickness="0">
+                                        <DatePicker.BlackoutDates>
+                                                <CalendarDateRange End="01/01/2022" />
+                                                <CalendarDateRange Start="1/1/2023" />
+                                            </DatePicker.BlackoutDates>
+                                        </DatePicker>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Header="Deadline">
+                            <DataGridTemplateColumn Header="Deadline" Width="auto">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <DatePicker SelectedDate="{Binding DateDue}" BorderThickness="0" />
+                                        <DatePicker SelectedDate="{Binding DateDue}" BorderThickness="0">
+                                        <DatePicker.BlackoutDates>
+                                                <CalendarDateRange End="01/01/2022" />
+                                                <CalendarDateRange Start="1/1/2023" />
+                                        </DatePicker.BlackoutDates>
+                                        </DatePicker>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="Price (EUR)" Binding="{Binding OrderPrice}"  />
+                            <DataGridTextColumn Header="Price (EUR)" Binding="{Binding OrderPrice}"  Width="auto" />
                         </DataGrid.Columns>
                     </DataGrid>
                 </DockPanel>
