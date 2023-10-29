@@ -3,10 +3,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:DispoAdmin.Views"    
+        xmlns:local="clr-namespace:DispoAdmin.Views"
         mc:Ignorable="d"
         
-        Title="My 3D Printer Farm Scheduling" Height="300" Width="1000">
+        Title="My 3D Printer Farm Scheduling" Height="700" Width="1500">
 
     <Window.Resources>
 
@@ -182,34 +182,27 @@
             <ColumnDefinition Width="1*" />
             <ColumnDefinition Width="1*" />
         </Grid.ColumnDefinitions>
+        
         <Grid.RowDefinitions>
-            <RowDefinition Height="0.5*" />
-            <RowDefinition Height="0.3*" />
+            <RowDefinition Height="50"  />
+            <RowDefinition Height="25" />
             <RowDefinition Height="1*" />
-            <RowDefinition Height="0.3*" />
+            <RowDefinition Height="25" />
             <RowDefinition Height="1*" />
-            <RowDefinition Height="0.3*" />
+            <RowDefinition Height="25" />
             <RowDefinition Height="1*" />
-            <RowDefinition Height="0.3*" />
+            <RowDefinition Height="25" />
             <RowDefinition Height="1*" />
-            <RowDefinition Height="0.3*" />
+            <RowDefinition Height="25" />
             <RowDefinition Height="1*" />
-            <RowDefinition Height="0.3*" />
+            <RowDefinition Height="25" />
             <RowDefinition Height="1*" />
-            <RowDefinition Height="0.3*" />
+            <RowDefinition Height="25" />
             <RowDefinition Height="1*" />
-            <RowDefinition Height="0.3*" />
+            <RowDefinition Height="25" />
             <RowDefinition Height="1*" />
-
         </Grid.RowDefinitions>
 
-        <TextBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="24" Text="Monday" HorizontalAlignment="Center" VerticalAlignment="Center"  BorderThickness="2"/>
-        <TextBox Grid.Row="0" Grid.Column="24" Grid.ColumnSpan="24" Text="Tuesday" HorizontalAlignment="Center" VerticalAlignment="Center"  BorderThickness="2"/>
-        <TextBox Grid.Row="0" Grid.Column="48" Grid.ColumnSpan="24" Text="Wednesday" HorizontalAlignment="Center" VerticalAlignment="Center"  BorderThickness="2"/>
-        <TextBox Grid.Row="0" Grid.Column="72" Grid.ColumnSpan="24" Text="Thurssday" HorizontalAlignment="Center" VerticalAlignment="Center"  BorderThickness="2"/>
-        <TextBox Grid.Row="0" Grid.Column="96" Grid.ColumnSpan="24" Text="Friday" HorizontalAlignment="Center" VerticalAlignment="Center"  BorderThickness="2"/>
-        <TextBox Grid.Row="0" Grid.Column="120" Grid.ColumnSpan="24" Text="Saturday" HorizontalAlignment="Center" VerticalAlignment="Center"  BorderThickness="2"/>
-        <TextBox Grid.Row="0" Grid.Column="144" Grid.ColumnSpan="24" Text="Sunday" HorizontalAlignment="Center" VerticalAlignment="Center"  BorderThickness="2"/>
 
     </Grid>
 </Window>

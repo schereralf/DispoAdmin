@@ -132,20 +132,23 @@ namespace DispoAdmin.ViewModels
 				if (k.JobName != null)
 				{
 					k.OrderID = this.Order.OrderID;
-                    context2.PrintJobs.Add(k);
+					Schedule s = new Schedule
+					{
+						PrintJobID = k.JobID,
+						RO_Time = k.PrintTime,
+						TimeStart = this.Order.DateIn,
+						TimeEnd = this.Order.DateDue,
+						ScheduleWeek = (this.Order.DateIn - dayDateStart).Value.Days / 7,
+						MR_Time = 0.5,
+						PrinterID = k.PrinterType
+					};
+
+					context2.PrintJobs.Add(k);
+					context2.Schedules.Add(s);
+
 				}
 			}
 
-			var termine2 = from l in _listSchedules
-						  orderby l.ScheduleWeek
-						  select l;
-			foreach (Schedule l in termine2)
-			{
-				if (l.ScheduleWeek != null)
-				{
-					context2.Schedules.Add(l);
-				}
-			}
 			context2.SaveChanges();
 		}
 
@@ -167,9 +170,9 @@ namespace DispoAdmin.ViewModels
         {
 				// Window for selecting gcode files for data extraction
 				// Three slicer+printer combinations possible now
-				// 1. Cura+Ultimaker2
+				// 1. Cura and Ultimaker2
 				// 2. PrusaSlicer and Prusa Mini
-				// 3. PrusaSlicer and Ender 3
+				// 3. Cura and Ender 3
 
 				OpenFileDialog openFileDialog = new();
 				openFileDialog.InitialDirectory = @"C:\Alf\Wifi_Coursework\GcodeFiles";
@@ -182,7 +185,7 @@ namespace DispoAdmin.ViewModels
 
 				gcodeText = File.ReadAllText(openFileDialog.FileName);
 
-				// first combination
+				// first combination - Gcode for a Ultimaker job created with the Cura slicer
 
 				if (gcodeText.Contains("UltiGCode") && gcodeText.Contains("Cura_SteamEngine"))
 				{
@@ -219,7 +222,7 @@ namespace DispoAdmin.ViewModels
 					SelectedPrintJob.PrinterType = 7;
 				}
 
-				// Second combination
+				// Second combination - Gcode for a Prusa Mini job created with the PrusaSlicer slicer 
 
 				else if (gcodeText.Contains("PrusaSlicer") && gcodeText.Contains("MINI"))
 				{
@@ -255,7 +258,7 @@ namespace DispoAdmin.ViewModels
 					SelectedPrintJob.PrinterType = 2;
 			}
 
-				// Third combination
+				// Third combination - Gcode for a Ender-3 job created with the Cura slicer 
 
 				else if (gcodeText.Contains("Marlin") && (gcodeText.Contains("MAXZ:40.8") ||gcodeText.Contains("MAXZ:17")))
 				{

@@ -26,7 +26,7 @@ namespace Model3DFarm
         public double? MR_Time { get; set; }
         public double? RO_Time { get; set; }
         
-        public int? ScheduleWeek { get; set; }
+        public int? ScheduleWeek { get; set ; }
 
         [ForeignKey(nameof(PrintJobID))]
         public virtual PrintJob PrintJob { get; set; }
