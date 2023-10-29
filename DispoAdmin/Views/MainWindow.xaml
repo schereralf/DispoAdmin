@@ -8,7 +8,7 @@
         d:DataContext="{d:DesignInstance Type=viewmodels:MainWindowViewModel}"
         mc:Ignorable="d"
         
-       Title="My 3D-Printer Farm" Height="400" Width="633">
+       Title="My 3D-Printer Farm" Height="600" Width="1000">
     <Grid>
         <Grid.ColumnDefinitions>
         </Grid.ColumnDefinitions>
@@ -107,7 +107,8 @@
             <TabItem Header="Schedule">
                 <StackPanel DockPanel.Dock="Right" Margin="80,50,80,80">
                     <TextBox HorizontalAlignment="Center" Height="25" TextWrapping="Wrap"  Text="{Binding ScheduleWeek}"  VerticalAlignment="Center" Width="110" />
-                    <Button Content="Schedule (enter week number above)" Command="{Binding CmdRegSchedule}" Margin="0,5" />
+                    <Button Content="Click to create a schedule (enter your week number in 2022 above)" Command="{Binding CmdRegSchedule}" Margin="50
+                            " Height="50" Background="LightGreen" BorderThickness="2"  BorderBrush="Black" />
                 </StackPanel>
             </TabItem>
 
@@ -138,7 +139,7 @@
 
             </TabItem>
 
-            <TabItem Header="Kosten und Erträge">
+            <TabItem Header="Profitability">
 
             </TabItem>
 

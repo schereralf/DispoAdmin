@@ -12,7 +12,6 @@ namespace Model3DFarm
     {
         public PrintJob()
         {
-            //Schedules = new HashSet<Schedule>();
             Schedule PrintSchedule = new();
         }
 

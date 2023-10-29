@@ -8,6 +8,7 @@ using System.Windows.Media;
 using Model3DFarm;
 using System.Reflection;
 using System.Collections.ObjectModel;
+using System.Globalization;
 
 namespace DispoAdmin.Views
 {
@@ -34,6 +35,8 @@ namespace DispoAdmin.Views
             }
         }
 
+        public string [] weekdays = new string[7];
+
         List<Button> Controls = new ();
         private int jobPosition;
         private int jobPositionWeek;
@@ -49,6 +52,14 @@ namespace DispoAdmin.Views
 
             int NewDate = (scheduleWeek - 1) * 7;
 
+            weekdays[0] = "Monday " + dayDateStart.AddDays(NewDate).ToString("dd/M/yyyy", CultureInfo.InvariantCulture);
+            weekdays[1] = "Tuesday " + dayDateStart.AddDays(NewDate + 1).ToString("dd/M/yyyy", CultureInfo.InvariantCulture);
+            weekdays[2] = "Wednesday " + dayDateStart.AddDays(NewDate + 2).ToString("dd/M/yyyy", CultureInfo.InvariantCulture);
+            weekdays[3] = "Thursday " + dayDateStart.AddDays(NewDate + 3).ToString("dd/M/yyyy", CultureInfo.InvariantCulture);
+            weekdays[4] = "Friday " + dayDateStart.AddDays(NewDate + 4).ToString("dd/M/yyyy", CultureInfo.InvariantCulture);
+            weekdays[5] = "Saturday " + dayDateStart.AddDays(NewDate + 5).ToString("dd/M/yyyy", CultureInfo.InvariantCulture);
+            weekdays[6] = "Sunday " + dayDateStart.AddDays(NewDate + 6).ToString("dd/M/yyyy", CultureInfo.InvariantCulture);
+
             using (PrinterfarmContext context = DispoAdminModel.Default.GetDBContext())
             {
                 ListPrinters.Clear();
@@ -58,22 +69,36 @@ namespace DispoAdmin.Views
                 foreach (Printer k in context.Printers) ListPrinters.Add(k);
 
                 bool [,] annSchedule = new bool[8736, ListPrinters.Count];
+
                 for (int i = 0; i < 8736; i++) { for (int j = 0; j < ListPrinters.Count;j++) { annSchedule[i, j] = true; } }
+                
+                for (int i = 0; i < 7; i++)
+                {
+                    TextBox t = new();
+                    t.Text = weekdays[i];
+                    Grid.SetRow(t,0);
+                    Grid.SetColumn(t, 24 * i);
+                    Grid.SetColumnSpan(t, 24);
+                    t.Background = PickBrush(4);
+                    t.HorizontalAlignment = HorizontalAlignment.Left;
+                    t.Width = 400;
+                    Dispogrid.Children.Add(t);
+                }
 
                 for (int i = 0; i < ListPrinters.Count; i++)
                 {
                     TextBox t = new ();
                     t.Text = ListPrinters[i].PrinterType;
                     Grid.SetRow(t, i * 2+1);
-                    Grid.SetColumnSpan(t, 167);
+                    Grid.SetColumnSpan(t, 168);
                     t.Background = PickBrush(3);
                     t.HorizontalAlignment = HorizontalAlignment.Left;
-                    t.Width = 2000;
+                    t.Width = 2100;
                     Dispogrid.Children.Add(t);
                 }
 
                     var result = from k in context.Schedules
-                             where k.ScheduleWeek == this.ScheduleWeek
+                             where k.TimeStart>dayDateStart
                              orderby k.TimeStart
                              select k;
 
@@ -88,30 +113,38 @@ namespace DispoAdmin.Views
                 for (int i = 0; i < ListSchedules.Count; i++)
                 {
                     ExtendedButton b = new();
-                    // unique MessageBox used here operates with ExtendedButton
 
-                    b._myval = ListSchedules[i].PrintJob.JobName.ToString() + " " + ListSchedules[i].PrintJob.Order.OrderName.ToString() + " "
-                        + ListSchedules[i].PrintJob.Material.ToString();
+                    // to spawn the job elements on the scheduling grid, a  unique MessageBox used here operates with ExtendedButton
+
+                    int jobRun = (int)Math.Ceiling((decimal)ListSchedules[i].MR_Time + (decimal)ListSchedules[i].RO_Time);
+                    b._myval = "Name of this job : " + ListSchedules[i].PrintJob.JobName.ToString() + "\nName of the order: " + ListSchedules[i].PrintJob.Order.OrderName.ToString() + "\nMaterial used: "
+                        + ListSchedules[i].PrintJob.Material.ToString() + "\nPrinting time: " + jobRun.ToString() + " hours";
+
                     //this assigns some job details to the extended button
 
                     b.Click += new RoutedEventHandler(OnButtonClick);
 
                     List<int> availableUnits=new();
                     int UnitUsed = 0;
-                    foreach (Printer p in ListPrinters) { UnitUsed++; if (p.PrinterID == ListSchedules[i].PrintJob.PrinterType) availableUnits.Add(UnitUsed); } 
+                    foreach (Printer p in ListPrinters) 
+                    {
+                        UnitUsed++;
+                        if (p.PrinterType == ListSchedules[i].Printer.PrinterType) 
+                            availableUnits.Add(UnitUsed); 
+                    } 
 
                     //Start Test Section
-                    int jobRun = (int)Math.Ceiling((decimal)ListSchedules[i].MR_Time + (decimal)ListSchedules[i].RO_Time);
-                    TimeSpan startTime = (TimeSpan)(ListSchedules[i].TimeStart - new DateTime(2022, 1, 1));
-                    TimeSpan endTime = (TimeSpan)(ListSchedules[i].TimeEnd - new DateTime(2022, 1, 1));
 
-                    int mindays = (int)startTime.TotalDays - 1;
-                    int maxdays = (int)endTime.TotalDays - 1;
+                    TimeSpan startTime = (TimeSpan)(ListSchedules[i].TimeStart - dayDateStart);
+                    TimeSpan endTime = (TimeSpan)(ListSchedules[i].TimeEnd - dayDateStart);
+
+                    int mindays = (int)startTime.TotalDays+1;
+                    int maxdays = (int)endTime.TotalDays;
 
                     DateTime schedHour = (DateTime)ListSchedules[i].TimeStart;
                     int minhours = (int)schedHour.TimeOfDay.TotalHours;
 
-                    jobCanStart = mindays * 24 + minhours;
+                    jobCanStart = mindays * 24 + minhours+1;
                     jobPosition = jobCanStart;
 
                     DateTime deadlineHour = (DateTime)ListSchedules[i].TimeEnd;
@@ -119,9 +152,13 @@ namespace DispoAdmin.Views
                     jobDeadline = maxdays * 24 + maxhours;
                     int printerRow = 0;
 
+                    // Go through the schedule on your first choice printer of the required type for the job, check for capacity.
+                    // If none is found, move on to the next available printer of the required type, else give an error message
+                    // something like "ALERT: job X cannot be scheduled"
+
                     bool isfree = false;
 
-                    while ((printerRow<availableUnits.Count)&&(!isfree))
+                    while ((printerRow<availableUnits.Count)&&(!isfree)&&(jobCanStart<jobDeadline))
                     {
                         if (!isfree)
                         {
@@ -158,12 +195,26 @@ namespace DispoAdmin.Views
                         return check;
                     }
 
-                    //Bedore displaying on a weekly schedule, translate the job position (in hours) into the hour count for the selected week
-                    jobPositionWeek = jobPosition - (int)ListSchedules[i].ScheduleWeek * 7 * 24;
+                    //Before displaying on a weekly schedule, translate the job position (in hours) as an hour count inside the selected week.
+                    //Need to first check for the holdover parts of runs that started during the previous week.
 
-                    this.Controls.Add(b);
-                    DeButnPlace(b, i, UnitUsed*2, jobRun, jobPositionWeek);
-                    Dispogrid.Children.Add(b);
+
+                    int startofthisweek = (ScheduleWeek-1) * 7 * 24;
+                    jobPositionWeek = jobPosition - startofthisweek;
+                    if (jobPositionWeek + jobRun > 0 && jobPositionWeek < 0)
+                    {
+                        jobRun += jobPositionWeek;
+                        jobPositionWeek = 0;
+                        this.Controls.Add(b);
+                        DeButnPlace(b, i, UnitUsed * 2, jobRun, jobPositionWeek);
+                        Dispogrid.Children.Add(b);
+                    }
+                    else if (jobPositionWeek > 0 && jobPositionWeek < 168 && isfree)
+                    {
+                        this.Controls.Add(b);
+                        DeButnPlace(b, i, UnitUsed * 2, jobRun, jobPositionWeek);
+                        Dispogrid.Children.Add(b);
+                    }
                 }
 
                 context.SaveChanges();
@@ -195,7 +246,6 @@ namespace DispoAdmin.Views
     }
         class ExtendedButton : Button //this class inherits from button
         {
-            //constructor
             public ExtendedButton()
             { }
 
