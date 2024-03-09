@@ -12,17 +12,15 @@ using System.Globalization;
 
 namespace DispoAdmin.Views
 {
-    /// <summary>
-    /// Interaction logic für DispoWindow.xaml
-    /// </summary>
+    // Interaction logic für DispoWindow.xaml
     public partial class DispoWindow : Window
     {
         public int ScheduleWeek;
 
-        private ObservableCollection<Schedule> _listSchedules;
+        private readonly ObservableCollection<Schedule> _listSchedules;
         public IList<Schedule> ListSchedules => _listSchedules;
 
-        List<Printer> ListPrinters= new ();
+        readonly List<Printer> ListPrinters= [];
 
         private Schedule _selectedSchedule;
 
@@ -37,11 +35,11 @@ namespace DispoAdmin.Views
 
         public string [] weekdays = new string[7];
 
-        List<Button> Controls = new ();
-        private int jobPosition;
-        private int jobPositionWeek;
-        private int jobCanStart;
-        private int jobDeadline;
+        readonly List<Button> Controls = [];
+        private readonly int jobPosition;
+        private readonly int jobPositionWeek;
+        private readonly int jobCanStart;
+        private readonly int jobDeadline;
 
         public DispoWindow(int scheduleWeek)
         {
@@ -64,7 +62,7 @@ namespace DispoAdmin.Views
             {
                 ListPrinters.Clear();
 
-                _listSchedules = new ObservableCollection<Schedule>();
+                _listSchedules = [];
 
                 foreach (Printer k in context.Printers) ListPrinters.Add(k);
 
@@ -74,8 +72,10 @@ namespace DispoAdmin.Views
                 
                 for (int i = 0; i < 7; i++)
                 {
-                    TextBox t = new();
-                    t.Text = weekdays[i];
+                    TextBox t = new()
+                    {
+                        Text = weekdays[i]
+                    };
                     Grid.SetRow(t,0);
                     Grid.SetColumn(t, 24 * i);
                     Grid.SetColumnSpan(t, 24);
@@ -87,8 +87,10 @@ namespace DispoAdmin.Views
 
                 for (int i = 0; i < ListPrinters.Count; i++)
                 {
-                    TextBox t = new ();
-                    t.Text = ListPrinters[i].PrinterType;
+                    TextBox t = new()
+                    {
+                        Text = ListPrinters[i].PrinterType
+                    };
                     Grid.SetRow(t, i * 2+1);
                     Grid.SetColumnSpan(t, 168);
                     t.Background = PickBrush(3);
@@ -107,7 +109,7 @@ namespace DispoAdmin.Views
                     ListSchedules.Add(k);
                 }
 
-                Random rnd = new Random();
+                Random rnd = new();
                 jobPosition = 0;
 
                 for (int i = 0; i < ListSchedules.Count; i++)
@@ -117,14 +119,14 @@ namespace DispoAdmin.Views
                     // to spawn the job elements on the scheduling grid, a  unique MessageBox used here operates with ExtendedButton
 
                     int jobRun = (int)Math.Ceiling((decimal)ListSchedules[i].MR_Time + (decimal)ListSchedules[i].RO_Time);
-                    b._myval = "Name of this job : " + ListSchedules[i].PrintJob.JobName.ToString() + "\nName of the order: " + ListSchedules[i].PrintJob.Order.OrderName.ToString() + "\nMaterial used: "
+                    b.Myval = "Name of this job : " + ListSchedules[i].PrintJob.JobName.ToString() + "\nName of the order: " + ListSchedules[i].PrintJob.Order.OrderName.ToString() + "\nMaterial used: "
                         + ListSchedules[i].PrintJob.Material.ToString() + "\nPrinting time: " + jobRun.ToString() + " hours";
 
                     //this assigns some job details to the extended button
 
                     b.Click += new RoutedEventHandler(OnButtonClick);
 
-                    List<int> availableUnits=new();
+                    List<int> availableUnits=[];
                     int UnitUsed = 0;
                     foreach (Printer p in ListPrinters) 
                     {
@@ -230,7 +232,7 @@ namespace DispoAdmin.Views
 
                 void OnButtonClick(object sender, EventArgs e)
                 {
-                    string jobName = ((ExtendedButton)sender)._myval;
+                    string jobName = ((ExtendedButton)sender).Myval;
                     MessageBox.Show(jobName);
                 }
 
@@ -250,7 +252,7 @@ namespace DispoAdmin.Views
             { }
 
             private string myval;
-            public string _myval
+            public string Myval
             {
                 get { return myval; }
                 set { myval = value; }
