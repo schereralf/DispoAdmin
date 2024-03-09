@@ -125,10 +125,10 @@ namespace DispoAdmin.ViewModels
             PrinterfarmContext printerfarmContext = DispoAdminModel.Default.GetDBContext();
             using PrinterfarmContext context = printerfarmContext;
 
-            _listOrders = new ObservableCollection<Order>();
-            _listPrinters = new ObservableCollection<Printer>();
-            _listServices = new ObservableCollection<ServiceLogEvent>();
-            _listMaterials = new ObservableCollection<Material>();
+            _listOrders = [];
+            _listPrinters = [];
+            _listServices = [];
+            _listMaterials = [];
 
             _cmdViewOrder = new RelayCommand(ViewOrder, () => SelectedOrder != null);
             _cmdAddOrder = new RelayCommand(AddOrder, () => SelectedOrder != null);
@@ -157,7 +157,6 @@ namespace DispoAdmin.ViewModels
             foreach (Printer k in context2.Printers) context2.Printers.Remove(k);
             foreach (ServiceLogEvent k in context2.ServiceLogEvents) context2.ServiceLogEvents.Remove(k);
             foreach (Material k in context2.Materials) context2.Materials.Remove(k);
-
             foreach (Order k in ListOrders) {context2.Orders.Add(k);}
             foreach (Printer k in ListPrinters) context2.Printers.Add(k);
             foreach (ServiceLogEvent k in ListServices) context2.ServiceLogEvents.Add(k);
@@ -206,6 +205,7 @@ namespace DispoAdmin.ViewModels
         {
             ListMaterials.Remove(SelectedMaterial);
         }
+
         //Pass over to view orders window
         public void ViewOrder()
         {           

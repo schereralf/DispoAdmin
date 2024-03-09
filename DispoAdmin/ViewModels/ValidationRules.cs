@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿
+using System;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 
 namespace DispoAdmin.ViewModels
@@ -40,7 +37,7 @@ namespace DispoAdmin.ViewModels
             try
             {
                 if (((string)date).Length > 0)
-                    sensedate = Int32.Parse((String)date);
+                    sensedate = int.Parse((string)date);
             }
             catch (Exception e)
             {
