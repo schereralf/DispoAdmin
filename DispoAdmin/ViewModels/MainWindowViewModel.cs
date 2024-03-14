@@ -151,18 +151,19 @@ namespace DispoAdmin.ViewModels
         public void SaveStuff()
         {
             PrinterfarmContext printerfarmContext = DispoAdminModel.Default.GetDBContext();
-            using PrinterfarmContext context2 = printerfarmContext;
+            using PrinterfarmContext updatedWorkSetup = printerfarmContext;
             
-            foreach (Order k in context2.Orders) {context2.Orders.Remove(k);}
-            foreach (Printer k in context2.Printers) context2.Printers.Remove(k);
-            foreach (ServiceLogEvent k in context2.ServiceLogEvents) context2.ServiceLogEvents.Remove(k);
-            foreach (Material k in context2.Materials) context2.Materials.Remove(k);
-            foreach (Order k in ListOrders) {context2.Orders.Add(k);}
-            foreach (Printer k in ListPrinters) context2.Printers.Add(k);
-            foreach (ServiceLogEvent k in ListServices) context2.ServiceLogEvents.Add(k);
-            foreach (Material k in ListMaterials) context2.Materials.Add(k);
+            foreach (Order k in updatedWorkSetup.Orders) updatedWorkSetup.Orders.Remove(k);
+            foreach (Printer k in updatedWorkSetup.Printers) updatedWorkSetup.Printers.Remove(k);
+            foreach (ServiceLogEvent k in updatedWorkSetup.ServiceLogEvents) updatedWorkSetup.ServiceLogEvents.Remove(k);
+            foreach (Material k in updatedWorkSetup.Materials) updatedWorkSetup.Materials.Remove(k);
 
-            context2.SaveChanges();
+            foreach (Order k in ListOrders) updatedWorkSetup.Orders.Add(k);
+            foreach (Printer k in ListPrinters) updatedWorkSetup.Printers.Add(k);
+            foreach (ServiceLogEvent k in ListServices) updatedWorkSetup.ServiceLogEvents.Add(k);
+            foreach (Material k in ListMaterials) updatedWorkSetup.Materials.Add(k);
+
+            updatedWorkSetup.SaveChanges();
         }
 
         public void AddOrder()

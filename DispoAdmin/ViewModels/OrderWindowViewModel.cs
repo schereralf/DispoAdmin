@@ -9,6 +9,8 @@ using System.Windows.Input;
 using DispoAdmin.Models;
 using System.IO;
 using Microsoft.Win32;
+using System.Windows;
+using Microsoft.IdentityModel.Tokens;
 
 namespace DispoAdmin.ViewModels
 {
@@ -18,18 +20,24 @@ namespace DispoAdmin.ViewModels
 
         public Order Order
         {    // 
-            get { return _order; }
-            set
-            {
-                _order = value;
-            }
+            get { return _order;}
+            set {_order = value;}
         }
         private readonly ObservableCollection<PrintJob> _listPrintJobs;
-        private readonly List<Schedule> _listSchedules;
+        private readonly IList<Schedule> _listSchedules;
+        public double materialPrice = new();
+        public double printerHourlyRate = new();
         public IList<PrintJob> ListPrintJobs => _listPrintJobs;
+        public IList<Schedule> ListSchedules => _listSchedules;
+        public List<Material> Materials = [];
+        public List<Printer> Printers = [];
+
         private PrintJob _selectedPrintJob;
 
         readonly DateTime dayDateStart = new(2022, 1, 3);
+        readonly int depreciationTime = 5;
+        readonly int workHoursPerWeek = 20;
+        readonly int laborHourlyRate = 35;
 
         private string gcodeText;
         private int layerheight;
@@ -44,19 +52,16 @@ namespace DispoAdmin.ViewModels
             {
                 _selectedPrintJob = value;
                 OnPropertyChanged();
-                _cmdAddPrintJob.RaiseCanExecuteChanged();
                 _cmdRemovePrintJob.RaiseCanExecuteChanged();
                 _cmdParsePrintJob.RaiseCanExecuteChanged();
                 _cmdSavePrintJobs.RaiseCanExecuteChanged();
             }
         }
 
-        private readonly RelayCommand _cmdAddPrintJob;
         private readonly RelayCommand _cmdRemovePrintJob;
         private readonly RelayCommand _cmdParsePrintJob;
         private readonly RelayCommand _cmdSavePrintJobs;
 
-        public ICommand CmdAddPrintJob { get { return _cmdAddPrintJob; } }
         public ICommand CmdRemovePrintJob { get { return _cmdRemovePrintJob; } }
         public ICommand CmdParsePrintJob { get { return _cmdParsePrintJob; } }
         public ICommand CmdSavePrintJobs { get { return _cmdSavePrintJobs; } }
@@ -69,91 +74,99 @@ namespace DispoAdmin.ViewModels
             _listPrintJobs = [];
             _listSchedules = [];
 
-            _cmdAddPrintJob = new RelayCommand(AddPrintJob, () => SelectedPrintJob != null);
             _cmdRemovePrintJob = new RelayCommand(RemovePrintJob, () => SelectedPrintJob != null);
             _cmdParsePrintJob = new RelayCommand(ParsePrintJob, () => SelectedPrintJob != null);
             _cmdSavePrintJobs = new RelayCommand(SavePrintJobs);
 
-            using PrinterfarmContext context = DispoAdminModel.Default.GetDBContext();
+            using PrinterfarmContext initialContext = DispoAdminModel.Default.GetDBContext();
             {
-                var result = from k in context.PrintJobs
-                             where k.Order == Order
-                             orderby k.JobName
-                             select k;
+                var initialPrintJobsList = from printJob in initialContext.PrintJobs
+                                                             where printJob.Order == Order
+                                                             orderby printJob.JobName
+                                                             select printJob;
 
-                foreach (PrintJob k in result)
+                foreach (Material m in initialContext.Materials) Materials.Add(m);
+                foreach (Printer p in initialContext.Printers) Printers.Add(p);
+
+                foreach (PrintJob printJob in initialPrintJobsList)
                 {
-                    k.OrderID = order.OrderID;
-                    Schedule s = new()
+                    printJob.OrderID = order.OrderID;
+                    Schedule schedule = new()
                     {
-                        PrintJobID = k.JobID,
-                        RO_Time = k.PrintTime,
+                        PrintJobID = printJob.JobID,
+                        RO_Time = printJob.PrintTime,
                         TimeStart = order.DateIn,
                         TimeEnd = order.DateDue,
                         ScheduleWeek = (order.DateIn - dayDateStart).Value.Days / 7,
-                        MR_Time = 0.5,
-                        PrinterID = k.PrinterType
+                        PrinterID = printJob.PrinterType
                     };
 
-                    _listPrintJobs.Add(k);
-                    _listSchedules.Add(s);
+                    Material printJobMaterial = Materials.FirstOrDefault(m => m.MaterialName.Trim() == printJob.Material.Trim());
+                    Printer printJobPrinter = Printers.FirstOrDefault(p => p.PrinterID == printJob.PrinterType);
+
+                    //The economic calculations are very rudimentary.  We assume:
+                    //  - the amortization period for all printers is 5 years, at zero IRR
+                    //  - average loading of available total hours per year (includes weekends, holidays and 24 hrs a day) is 24%
+                    //  - only machine time is counted, which includes MR and run time (no proper maintenance can be scheduled here yet)
+
+                    materialPrice = (double)printJobMaterial.MaterialPrice;
+                    printerHourlyRate = printJobPrinter.PrinterPurchPrice / depreciationTime / workHoursPerWeek / 52;
+
+                    schedule.MR_Time = printJobPrinter.MRTimeEst;
+                    printJob.Costs = materialPrice * printJob.WeightMaterial / 1000 + (schedule.MR_Time + schedule.RO_Time) * printerHourlyRate + schedule.MR_Time * laborHourlyRate;
+
+                    _listPrintJobs.Add(printJob);
+                    _listSchedules.Add(schedule);
+
                 }
+                initialContext.SaveChanges();
             }
         }
 
         public void SavePrintJobs()
         {
-            using PrinterfarmContext context2 = DispoAdminModel.Default.GetDBContext();
+            using PrinterfarmContext updatedContext = DispoAdminModel.Default.GetDBContext();
 
-            var result1 = from k in context2.PrintJobs
-                          where k.Order == Order
-                          orderby k.JobName
-                          select k;
-            var termine = from l in context2.Schedules
-                          where l.PrintJob.Order == Order
-                          select l;
+            var initialPrintJobsList = from printJob in updatedContext.PrintJobs
+                          where printJob.Order == Order
+                          orderby printJob.JobName
+                          select printJob;
+            var initialSchedulesList = from schedule in updatedContext.Schedules
+                          where schedule.PrintJob.Order == Order
+                          select schedule;
 
-            foreach (PrintJob k in result1)
+            foreach (PrintJob printJob in initialPrintJobsList) updatedContext.PrintJobs.Remove(printJob);
+            foreach (Schedule schedule in initialSchedulesList) updatedContext.Schedules.Remove(schedule);
+
+            var updatedPrintJobsList = from printJob in ListPrintJobs
+                          orderby printJob.JobName
+                          select printJob;
+
+            foreach (PrintJob printJob in updatedPrintJobsList)
             {
-                context2.PrintJobs.Remove(k);
-            }
-
-            foreach (Schedule l in termine)
-            {
-                context2.Schedules.Remove(l);
-            }
-
-            var result2 = from k in ListPrintJobs
-                          orderby k.JobName
-                          select k;
-            foreach (PrintJob k in result2)
-            {
-                if (k.JobName != null)
+                if (printJob.JobName.IsNullOrEmpty())
                 {
-                    k.OrderID = Order.OrderID;
-                    Schedule s = new()
-                    {
-                        PrintJobID = k.JobID,
-                        RO_Time = k.PrintTime,
-                        TimeStart = Order.DateIn,
-                        TimeEnd = Order.DateDue,
-                        ScheduleWeek = (Order.DateIn - dayDateStart).Value.Days / 7,
-                        MR_Time = 0.5,
-                        PrinterID = k.PrinterType
-                    };
-
-                    context2.PrintJobs.Add(k);
-                    context2.Schedules.Add(s);
+                    printJob.OrderID = Order.OrderID;
+                    updatedContext.PrintJobs.Add(printJob);
+                }
+                else
+                {
+                    MessageBox.Show($"Please give this job a name before closing the window, then hit the save button again !");
                 }
             }
-            context2.SaveChanges();
-        }
 
-        public void AddPrintJob()
-        {
-            Schedule s = _listSchedules.FirstOrDefault(s => s.PrintJobID == SelectedPrintJob.JobID);
-            ListPrintJobs.Add(SelectedPrintJob);
-            _listSchedules.Add(s);
+            var updatedSchedulesList = from schedule in ListSchedules
+                           orderby schedule.ScheduleWeek
+                           select schedule;
+
+            foreach (Schedule schedule in updatedSchedulesList)
+            {
+                if (schedule.ScheduleWeek != null)
+                {
+                    updatedContext.Schedules.Add(schedule);
+                }
+            }
+            updatedContext.SaveChanges();
         }
 
         public void RemovePrintJob()
@@ -177,7 +190,7 @@ namespace DispoAdmin.ViewModels
                 Filter = "Gcode files (*.gcode)|*.gcode|All files (*.*)|*.*"
             };
 
-            if (openFileDialog.ShowDialog() == true) 
+            if (openFileDialog.ShowDialog() == true)
                 SelectedPrintJob.GcodeAdresse = openFileDialog.FileName[..25];
 
             string[] gcodeLines = File.ReadAllLines(openFileDialog.FileName);

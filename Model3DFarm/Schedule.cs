@@ -13,7 +13,7 @@ namespace Model3DFarm
     {
         [Key]
         public int JobScheduleID { get; set; }
-        //public int PrintJobID { get; set; }
+
         public int PrinterID { get; set; }
 
         public int PrintJobID { get; set; }
