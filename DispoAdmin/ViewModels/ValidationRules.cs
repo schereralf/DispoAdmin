@@ -11,8 +11,8 @@ namespace DispoAdmin.ViewModels
     public class DateValidationRule : ValidationRule
     {
         private DateTime _termin;
-        public int mindate { get; set; }
-        public int maxdate { get; set; }
+        public int Mindate { get; set; }
+        public int Maxdate { get; set; }
 
         //private Regex _regex;
 
@@ -45,7 +45,7 @@ namespace DispoAdmin.ViewModels
             }
 
 
-            if (sensedate < mindate || sensedate > maxdate)
+            if (sensedate < Mindate || sensedate > Maxdate)
             {
                 return new ValidationResult(false, "The value is not a valid scheduling date !");
             }

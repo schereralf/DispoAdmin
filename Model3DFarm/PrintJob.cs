@@ -40,6 +40,7 @@ namespace Model3DFarm
 
         public double? PrintTime { get; set; }
 
+        public double? Costs { get; set; }
 
         [ForeignKey(nameof(JobID))]
 

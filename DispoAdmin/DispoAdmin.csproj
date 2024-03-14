@@ -20,6 +20,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="DispoBaseLib">
+      <HintPath>..\DispoBaseLib\bin\Debug\net8.0\DispoBaseLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Model3DFarm">
+      <HintPath>..\Model3DFarm\bin\Debug\net8.0\Model3DFarm.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="Properties\Settings.Designer.cs">
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <AutoGen>True</AutoGen>

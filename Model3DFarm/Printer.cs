@@ -22,6 +22,7 @@ namespace Model3DFarm
         [Column(TypeName = "datetime")]
         public DateTime? PrinterPurchDate { get; set; }
         public double PrinterPurchPrice { get; set; }
+        public double? MRTimeEst { get; set; }
         public double? ServiceTimeEst { get; set; }
         public virtual ICollection<Schedule> Schedules { get; set; }
     }
