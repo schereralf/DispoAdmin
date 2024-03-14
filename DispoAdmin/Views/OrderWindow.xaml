@@ -8,10 +8,9 @@
         d:DataContext="{d:DesignInstance Type=viewmodels:OrderWindowViewModel}"
         mc:Ignorable="d"
         
-        Title="My 3D Printer Farm - Print Jobs" Height="300" Width="900">
+        Title="My 3D Printer Farm - Print Jobs" Height="300" Width="1200">
     <DockPanel Margin="20">
         <StackPanel DockPanel.Dock="Right" Margin="10,0,0,0">
-            <Button Content="Add PrintJob" Command="{Binding CmdAddPrintJob}" Margin="0,5" />
             <Button Content="Remove PrintJob" Command="{Binding CmdRemovePrintJob}" Margin="0,5"/>
             <Button Content="Locate + Parse" Command="{Binding CmdParsePrintJob}" Margin="0,5"/>
             <Button Content="Save Order Details" Command="{Binding CmdSavePrintJobs}" Margin="0,5"/>
@@ -27,7 +26,8 @@
                 <DataGridTextColumn Header="Layers, 0.01mm" Binding="{Binding LayerHeight}" Width="auto"/>
                 <DataGridTextColumn Header="Material, g" Binding="{Binding WeightMaterial, StringFormat={}{0:n2}}" Width="auto"/>
                 <DataGridTextColumn Header="PrintTime, h" Binding="{Binding PrintTime, StringFormat={}{0:n2}}" Width="auto"/>
-                <DataGridHyperlinkColumn Header="File Adress" Binding="{Binding GcodeAdresse}" Width="250"/>
+                <DataGridHyperlinkColumn Header="File Adress" Binding="{Binding GcodeAdresse}" Width="200"/>
+                <DataGridTextColumn Header="Total Costs €" Binding="{Binding Costs, StringFormat={}{0:n2}}" Width="auto"/>
             </DataGrid.Columns>
         </DataGrid>
 
