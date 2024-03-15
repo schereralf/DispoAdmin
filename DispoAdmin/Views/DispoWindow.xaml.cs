@@ -40,6 +40,7 @@ namespace DispoAdmin.Views
         private readonly int jobPositionWeek;
         private readonly int jobCanStart;
         private readonly int jobDeadline;
+        public Brush BackgroundBrush;
 
         public DispoWindow(int scheduleWeek)
         {
@@ -61,12 +62,10 @@ namespace DispoAdmin.Views
             using (PrinterfarmContext context = DispoAdminModel.Default.GetDBContext())
             {
                 ListPrinters.Clear();
-
                 _listSchedules = [];
-
                 foreach (Printer k in context.Printers) ListPrinters.Add(k);
+                bool[,] annSchedule = new bool[8736, ListPrinters.Count + 1];
 
-                bool[,] annSchedule = new bool[8736, ListPrinters.Count+1];
 
                 for (int i = 0; i < 8736; i++) { for (int j = 0; j <= ListPrinters.Count; j++) { annSchedule[i, j] = true; } }
 
@@ -108,19 +107,24 @@ namespace DispoAdmin.Views
 
                 Button moveLeft = new();
                 moveLeft.Content = "<<== Push here to select the previous week";
+                moveLeft.FontWeight = FontWeights.Bold;
                 Grid.SetRow(moveLeft, 18);
                 Grid.SetColumn(moveLeft, 5);
                 Grid.SetColumnSpan(moveLeft, 40);
-                moveLeft.Background = PickBrush(1);
+                moveLeft.Background = PickBrush(4);
+
                 moveLeft.Click += new RoutedEventHandler(OnButtonClick2);
                 Dispogrid.Children.Add(moveLeft);
 
                 Button moveRight = new();
                 moveRight.Content = "Push here to select the next week ==>>";
+
+                moveRight.FontWeight = FontWeights.Bold;
                 Grid.SetRow(moveRight, 18);
                 Grid.SetColumn(moveRight, 120);
                 Grid.SetColumnSpan(moveRight, 40);
-                moveRight.Background = PickBrush(1);
+                moveRight.Background = PickBrush(4);
+
                 moveRight.Click += new RoutedEventHandler(OnButtonClick3);
                 Dispogrid.Children.Add(moveRight);
 
@@ -130,7 +134,7 @@ namespace DispoAdmin.Views
                 {
                     ExtendedButton b = new();
 
-                    // to spawn the job elements on the scheduling grid, a  unique MessageBox used here operates with ExtendedButton
+                    // to allow a look at the job attributes, a unique MessageBox uses ExtendedButton
 
                     int jobRun = (int)Math.Ceiling((decimal)ListSchedules[i].MR_Time + (decimal)ListSchedules[i].RO_Time);
                     b.Myval =
@@ -142,9 +146,12 @@ namespace DispoAdmin.Views
 
                     //this assigns some job details to the extended button
 
+                    if (i==0 || ListSchedules[i].PrintJob.Order!= ListSchedules[i-1].PrintJob.Order) BackgroundBrush= PickBrush(rnd.Next(20));
+
                     b.Click += new RoutedEventHandler(OnButtonClick);
 
                     // We need to deal with printer rows on the schedule board carefully.  These are not really the same as the printer ID's,
+
                     // so for a pity Linq makes no sense since we want to track the position of candidate production units for our print job.
 
                     List<int> availableUnits = [];
@@ -198,7 +205,15 @@ namespace DispoAdmin.Views
                     if (isfree)
                     {
                         int spec = availableUnits[printerRow-1];
-                        for (int m = 0; m < jobRun; m++) annSchedule[jobPosition + m, spec] = false;
+
+                        for (int m = 0; m < jobRun; m++) 
+                            annSchedule[jobPosition + m, spec] = false;
+                    }
+                    else 
+                    {
+                        MessageBox.Show($"A job cannot be scheduled !  Its:  {ListSchedules[i].PrintJob.JobName} for {ListSchedules[i].PrintJob.Order.CustomerName}\n" +
+                            $"sent: {ListSchedules[i].TimeStart} , due: {ListSchedules[i].TimeEnd}, on {ListSchedules[i].Printer.PrinterType}");
+
                     }
                     else 
                     {
@@ -213,7 +228,9 @@ namespace DispoAdmin.Views
                     {
                         bool check = true;
                         UnitUsed = WorkingRows[printerRow-1];
-                        for (int l = 1; l < jobRun; l++)
+
+                        for (int l = 1; l <= jobRun; l++)
+
                         {
                             bool bot = annSchedule[jobBegin + l, WorkingRows[printerRow-1]];
                             if (!bot) check = false;
@@ -249,7 +266,7 @@ namespace DispoAdmin.Views
                     Grid.SetRow(thisButton, row);
                     Grid.SetColumn(thisButton, jobPosition);
                     Grid.SetColumnSpan(thisButton, jobRun);
-                    thisButton.Background = PickBrush(rnd.Next(20));
+                    thisButton.Background = BackgroundBrush;
                     thisButton.Content = ListSchedules[j].PrintJob.JobName;
                 }
 

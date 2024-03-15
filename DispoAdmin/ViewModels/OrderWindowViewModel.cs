@@ -19,11 +19,8 @@ namespace DispoAdmin.ViewModels
 
         public Order Order
         {    // 
-            get { return _order; }
-            set
-            {
-                _order = value;
-            }
+            get { return _order;}
+            set {_order = value;}
         }
         private readonly ObservableCollection<PrintJob> _listPrintJobs;
         private readonly IList<Schedule> _listSchedules;
@@ -54,19 +51,17 @@ namespace DispoAdmin.ViewModels
             {
                 _selectedPrintJob = value;
                 OnPropertyChanged();
-          //      _cmdAddPrintJob.RaiseCanExecuteChanged();
+
                 _cmdRemovePrintJob.RaiseCanExecuteChanged();
                 _cmdParsePrintJob.RaiseCanExecuteChanged();
                 _cmdSavePrintJobs.RaiseCanExecuteChanged();
             }
         }
 
-        //private readonly RelayCommand _cmdAddPrintJob;
         private readonly RelayCommand _cmdRemovePrintJob;
         private readonly RelayCommand _cmdParsePrintJob;
         private readonly RelayCommand _cmdSavePrintJobs;
 
-        //public ICommand CmdAddPrintJob { get { return _cmdAddPrintJob; } }
         public ICommand CmdRemovePrintJob { get { return _cmdRemovePrintJob; } }
         public ICommand CmdParsePrintJob { get { return _cmdParsePrintJob; } }
         public ICommand CmdSavePrintJobs { get { return _cmdSavePrintJobs; } }
@@ -79,21 +74,13 @@ namespace DispoAdmin.ViewModels
             _listPrintJobs = [];
             _listSchedules = [];
 
-            //_cmdAddPrintJob = new RelayCommand(AddPrintJob, () => SelectedPrintJob != null);
             _cmdRemovePrintJob = new RelayCommand(RemovePrintJob, () => SelectedPrintJob != null);
             _cmdParsePrintJob = new RelayCommand(ParsePrintJob, () => SelectedPrintJob != null);
             _cmdSavePrintJobs = new RelayCommand(SavePrintJobs);
 
             using PrinterfarmContext initialContext = DispoAdminModel.Default.GetDBContext();
             {
-                IOrderedQueryable initialPrintJobsList = from printJob in initialContext.PrintJobs
-                                                             where printJob.Order == Order
-                                                             orderby printJob.JobName
-                                                             select printJob;
-
-                foreach (Material m in initialContext.Materials) Materials.Add(m);
-                foreach (Printer p in initialContext.Printers) Printers.Add(p);
-
+            
                 foreach (PrintJob printJob in initialPrintJobsList)
                 {
                     printJob.OrderID = order.OrderID;
@@ -144,24 +131,12 @@ namespace DispoAdmin.ViewModels
             foreach (PrintJob printJob in initialPrintJobsList) updatedContext.PrintJobs.Remove(printJob);
             foreach (Schedule schedule in initialSchedulesList) updatedContext.Schedules.Remove(schedule);
 
-            var updatedPrintJobsList = from printJob in ListPrintJobs
-                          orderby printJob.JobName
-                          select printJob;
-
-            foreach (PrintJob printJob in updatedPrintJobsList)
-            {
-                if (printJob.JobName != null)
                 {
                     printJob.OrderID = Order.OrderID;
                     updatedContext.PrintJobs.Add(printJob);
                 }
                 else
                 {
-                    MessageBox.Show($"Please give this job a name before closing the window, and then hit the save button again !");
-                }
-            }
-
-            var updatedSchedulesList = from schedule in ListSchedules
                            orderby schedule.ScheduleWeek
                            select schedule;
 
