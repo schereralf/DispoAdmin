@@ -144,7 +144,7 @@ namespace DispoAdmin.ViewModels
 
             foreach (PrintJob printJob in updatedPrintJobsList)
             {
-                if (printJob.JobName.IsNullOrEmpty())
+                if (!printJob.JobName.IsNullOrEmpty())
                 {
                     printJob.OrderID = Order.OrderID;
                     updatedContext.PrintJobs.Add(printJob);
@@ -155,7 +155,7 @@ namespace DispoAdmin.ViewModels
                 }
             }
 
-            var updatedSchedulesList = from schedule in ListSchedules
+            var updatedSchedulesList = from schedule in _listSchedules
                            orderby schedule.ScheduleWeek
                            select schedule;
 
