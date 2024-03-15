@@ -199,7 +199,8 @@ namespace DispoAdmin.Views
                     if (isfree)
                     {
                         int spec = availableUnits[printerRow-1];
-                        for (int m = 0; m < jobRun; m++) annSchedule[jobPosition + m, spec] = false;
+                        for (int m = 0; m < jobRun; m++) 
+                            annSchedule[jobPosition + m, spec] = false;
                     }
                     else 
                     {
@@ -214,7 +215,7 @@ namespace DispoAdmin.Views
                     {
                         bool check = true;
                         UnitUsed = WorkingRows[printerRow-1];
-                        for (int l = 1; l < jobRun; l++)
+                        for (int l = 1; l <= jobRun; l++)
                         {
                             bool bot = annSchedule[jobBegin + l, WorkingRows[printerRow-1]];
                             if (!bot) check = false;
