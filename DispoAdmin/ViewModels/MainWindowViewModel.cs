@@ -29,7 +29,7 @@ namespace DispoAdmin.ViewModels
         private ServiceLogEvent _selectedService;
         private Material _selectedMaterial;
         private int _scheduleWeek;
-        static readonly List<string> AvailablePrinterModels =
+        private static readonly IList<string> availablePrinterModels =
         [
             "Prusa i3",
             "Prusa Mini",
@@ -38,6 +38,7 @@ namespace DispoAdmin.ViewModels
             "Ultimaker 2",
             "Resin Printer"
         ];
+        public static IList<string> AvailablePrinterModels => availablePrinterModels;
 
         //Setup line selection and button actions
         //Order tab contains button to open jobs listing in "OrderWindow" window for selected order
