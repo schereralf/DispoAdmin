@@ -110,7 +110,6 @@ namespace DispoAdmin.ViewModels
 
                     _listPrintJobs.Add(printJob);
                     _listSchedules.Add(schedule);
-
                 }
                 initialContext.SaveChanges();
             }
@@ -137,6 +136,11 @@ namespace DispoAdmin.ViewModels
                 }
                 else
                 {
+                    MessageBox.Show("Please give this job a name before closing the window, then hit the save button again !");
+                }
+            }
+
+            var updatedSchedulesList = from schedule in _listSchedules
                            orderby schedule.ScheduleWeek
                            select schedule;
 
@@ -148,6 +152,7 @@ namespace DispoAdmin.ViewModels
                 }
             }
             updatedContext.SaveChanges();
+            MessageBox.Show("All saved, please hit OK  here and close this order window !");
         }
 
         public void RemovePrintJob()
@@ -191,12 +196,12 @@ namespace DispoAdmin.ViewModels
                 SelectedPrintJob.PrinterType = 2;
                 Read_PrusaMini(gcodeLines);
             }
-            else if (gcodeText.Contains("Marlin") && (gcodeText.Contains("MAXZ:40.8") || gcodeText.Contains("MAXZ:17")))
+            else if (gcodeText.Contains("FLAVOR:Marlin") && (gcodeText.Contains("Cura_SteamEngine")))
             {
                 SelectedPrintJob.PrinterType = 3;
                 Read_Ender3(gcodeLines);
             }
-            else throw new Exception("This printer has not yet been included");
+            else MessageBox.Show ("This printer has not yet been included");
         }
 
         // first combination - Gcode for a Ultimaker job created with the Cura slicer
@@ -264,8 +269,6 @@ namespace DispoAdmin.ViewModels
 
             int volz = 180;
             SelectedPrintJob.VolZ = volz;
-
-            SelectedPrintJob.PrinterType = 2;
         }
 
         // Third combination - Gcode for a Ender-3 job created with the Cura slicer 
@@ -300,10 +303,6 @@ namespace DispoAdmin.ViewModels
             float volZ = float.Parse(volZtxt, System.Globalization.CultureInfo.InvariantCulture);
             int volz = (int)volZ;
             SelectedPrintJob.VolZ = volz;
-
-            if (gcodeText.Contains("MAXZ:17"))
-                SelectedPrintJob.PrinterType = 3;
-            else SelectedPrintJob.PrinterType = 4;
         }
     }
 }
