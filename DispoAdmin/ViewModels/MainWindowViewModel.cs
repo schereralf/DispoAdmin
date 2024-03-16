@@ -6,6 +6,7 @@ using Model3DFarm;
 using DispoAdmin.Models;
 using DispoAdmin.Views;
 using System.Windows.Input;
+using System.Windows;
 
 namespace DispoAdmin.ViewModels
 {
@@ -28,6 +29,15 @@ namespace DispoAdmin.ViewModels
         private ServiceLogEvent _selectedService;
         private Material _selectedMaterial;
         private int _scheduleWeek;
+        static readonly List<string> AvailablePrinterModels =
+        [
+            "Prusa i3",
+            "Prusa Mini",
+            "Ender 3",
+            "Ender 5",
+            "Ultimaker 2",
+            "Resin Printer"
+        ];
 
         //Setup line selection and button actions
         //Order tab contains button to open jobs listing in "OrderWindow" window for selected order
@@ -164,6 +174,7 @@ namespace DispoAdmin.ViewModels
             foreach (Material k in ListMaterials) updatedWorkSetup.Materials.Add(k);
 
             updatedWorkSetup.SaveChanges();
+            MessageBox.Show("All saved, please hit OK  here and move to the next window\n or just close this window and revisit your printer park later !");
         }
 
         public void AddOrder()
@@ -179,6 +190,7 @@ namespace DispoAdmin.ViewModels
 
         public void AddPrinter()
         {
+
             ListPrinters.Add(SelectedPrinter);
         }
 

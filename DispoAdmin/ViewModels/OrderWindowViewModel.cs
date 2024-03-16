@@ -10,6 +10,7 @@ using DispoAdmin.Models;
 using System.IO;
 using Microsoft.Win32;
 using System.Windows;
+using Microsoft.IdentityModel.Tokens;
 
 namespace DispoAdmin.ViewModels
 {
@@ -51,7 +52,6 @@ namespace DispoAdmin.ViewModels
             {
                 _selectedPrintJob = value;
                 OnPropertyChanged();
-
                 _cmdRemovePrintJob.RaiseCanExecuteChanged();
                 _cmdParsePrintJob.RaiseCanExecuteChanged();
                 _cmdSavePrintJobs.RaiseCanExecuteChanged();
@@ -80,7 +80,14 @@ namespace DispoAdmin.ViewModels
 
             using PrinterfarmContext initialContext = DispoAdminModel.Default.GetDBContext();
             {
-            
+                var initialPrintJobsList = from printJob in initialContext.PrintJobs
+                                           where printJob.Order == Order
+                                           orderby printJob.JobName
+                                           select printJob;
+
+                foreach (Material m in initialContext.Materials) Materials.Add(m);
+                foreach (Printer p in initialContext.Printers) Printers.Add(p);
+
                 foreach (PrintJob printJob in initialPrintJobsList)
                 {
                     printJob.OrderID = order.OrderID;
@@ -130,6 +137,13 @@ namespace DispoAdmin.ViewModels
             foreach (PrintJob printJob in initialPrintJobsList) updatedContext.PrintJobs.Remove(printJob);
             foreach (Schedule schedule in initialSchedulesList) updatedContext.Schedules.Remove(schedule);
 
+            var updatedPrintJobsList = from printJob in ListPrintJobs
+                                       orderby printJob.JobName
+                                       select printJob;
+
+            foreach (PrintJob printJob in updatedPrintJobsList)
+            {
+                if (!printJob.JobName.IsNullOrEmpty())
                 {
                     printJob.OrderID = Order.OrderID;
                     updatedContext.PrintJobs.Add(printJob);
@@ -188,17 +202,17 @@ namespace DispoAdmin.ViewModels
         {
             if (gcodeText.Contains("UltiGCode") && gcodeText.Contains("Cura_SteamEngine"))
             {
-                SelectedPrintJob.PrinterType = 7;
+                SelectedPrintJob.PrinterType = Printers.Where(p=>p.PrinterType=="Ultimaker 2").FirstOrDefault().PrinterID;
                 Read_Ultimaker(gcodeLines);
             }
             else if (gcodeText.Contains("PrusaSlicer") && gcodeText.Contains("MINI"))
             {
-                SelectedPrintJob.PrinterType = 2;
+                SelectedPrintJob.PrinterType = Printers.Where(p => p.PrinterType == "Prusa Mini").FirstOrDefault().PrinterID;
                 Read_PrusaMini(gcodeLines);
             }
             else if (gcodeText.Contains("FLAVOR:Marlin") && (gcodeText.Contains("Cura_SteamEngine")))
             {
-                SelectedPrintJob.PrinterType = 3;
+                SelectedPrintJob.PrinterType = Printers.Where(p => p.PrinterType == "Ender 3").FirstOrDefault().PrinterID;
                 Read_Ender3(gcodeLines);
             }
             else MessageBox.Show ("This printer has not yet been included");
