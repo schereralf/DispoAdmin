@@ -9,6 +9,12 @@
         mc:Ignorable="d"
         
        Title="My 3D-Printer Farm" Height="600" Width="1000">
+
+    <Window.Resources>
+        <!--Fetch list of printers-->
+        <CollectionViewSource x:Key="myPrinterList" Source="{Binding AvailablePrinterModels}"/>
+    </Window.Resources>
+
     <Grid>
         <Grid.ColumnDefinitions>
         </Grid.ColumnDefinitions>
@@ -26,7 +32,7 @@
 
                     <DataGrid ItemsSource="{Binding ListPrinters}" SelectedItem="{Binding SelectedPrinter}" AutoGenerateColumns="False">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Printer" Binding="{Binding PrinterType}" FontSize="10" Width="auto"/>
+                            <DataGridComboBoxColumn Header="Printer"  SelectedItemBinding="{Binding PrinterType}" ItemsSource="{Binding Source={StaticResource myPrinterList}}" Width="100" />
                             <DataGridTextColumn Header="ServiceTime" Binding="{Binding ServiceTimeEst}"   Width="auto" />
                             <DataGridTemplateColumn Header="Purchase Date" Width="auto">
                                 <DataGridTemplateColumn.CellTemplate>
