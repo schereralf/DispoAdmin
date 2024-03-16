@@ -11,6 +11,7 @@
     <Window.Resources>
 
     </Window.Resources>
+
     <Border Background="Transparent" BorderBrush="DarkBlue" BorderThickness="10" CornerRadius="8,8,3,3">
         <Grid x:Name="Dispogrid">
 

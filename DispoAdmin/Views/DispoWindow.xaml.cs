@@ -66,7 +66,9 @@ namespace DispoAdmin.Views
                 foreach (Printer k in context.Printers) ListPrinters.Add(k);
                 bool[,] annSchedule = new bool[8736, ListPrinters.Count + 1];
 
+
                 for (int i = 0; i < 8736; i++) { for (int j = 0; j <= ListPrinters.Count; j++) { annSchedule[i, j] = true; } }
+
                 for (int i = 0; i < 7; i++)
                 {
                     TextBox t = new()
@@ -110,16 +112,19 @@ namespace DispoAdmin.Views
                 Grid.SetColumn(moveLeft, 5);
                 Grid.SetColumnSpan(moveLeft, 40);
                 moveLeft.Background = PickBrush(4);
+
                 moveLeft.Click += new RoutedEventHandler(OnButtonClick2);
                 Dispogrid.Children.Add(moveLeft);
 
                 Button moveRight = new();
                 moveRight.Content = "Push here to select the next week ==>>";
+
                 moveRight.FontWeight = FontWeights.Bold;
                 Grid.SetRow(moveRight, 18);
                 Grid.SetColumn(moveRight, 120);
                 Grid.SetColumnSpan(moveRight, 40);
                 moveRight.Background = PickBrush(4);
+
                 moveRight.Click += new RoutedEventHandler(OnButtonClick3);
                 Dispogrid.Children.Add(moveRight);
 
@@ -146,7 +151,8 @@ namespace DispoAdmin.Views
                     b.Click += new RoutedEventHandler(OnButtonClick);
 
                     // We need to deal with printer rows on the schedule board carefully.  These are not really the same as the printer ID's,
-                    // so using Linq makes no sense since we want to track the position of candidate production units for our print job.
+
+                    // so for a pity Linq makes no sense since we want to track the position of candidate production units for our print job.
 
                     List<int> availableUnits = [];
                     int UnitUsed = 0;
@@ -199,8 +205,15 @@ namespace DispoAdmin.Views
                     if (isfree)
                     {
                         int spec = availableUnits[printerRow-1];
+
                         for (int m = 0; m < jobRun; m++) 
                             annSchedule[jobPosition + m, spec] = false;
+                    }
+                    else 
+                    {
+                        MessageBox.Show($"A job cannot be scheduled !  Its:  {ListSchedules[i].PrintJob.JobName} for {ListSchedules[i].PrintJob.Order.CustomerName}\n" +
+                            $"sent: {ListSchedules[i].TimeStart} , due: {ListSchedules[i].TimeEnd}, on {ListSchedules[i].Printer.PrinterType}");
+
                     }
                     else 
                     {
@@ -215,7 +228,9 @@ namespace DispoAdmin.Views
                     {
                         bool check = true;
                         UnitUsed = WorkingRows[printerRow-1];
+
                         for (int l = 1; l <= jobRun; l++)
+
                         {
                             bool bot = annSchedule[jobBegin + l, WorkingRows[printerRow-1]];
                             if (!bot) check = false;
