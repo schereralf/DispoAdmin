@@ -7,6 +7,7 @@ using DispoAdmin.Models;
 using DispoAdmin.Views;
 using System.Windows.Input;
 using System.Windows;
+using System.Linq;
 
 namespace DispoAdmin.ViewModels
 {
@@ -38,7 +39,49 @@ namespace DispoAdmin.ViewModels
             "Ultimaker 2",
             "Resin Printer"
         ];
+        private double? _costsTotal;
+        private int _countOrders;
+        private double _revenuesTotal;
+        private int _countPrintJobs;
+
         public static IList<string> AvailablePrinterModels => availablePrinterModels;
+        public double? CostsTotal
+        {    // for binding
+            get { return _costsTotal; }
+            set
+            {
+                _costsTotal = value;
+                OnPropertyChanged();
+            }
+        }
+        public int CountOrders
+        {    // for binding
+            get { return _countOrders; }
+            set
+            {
+                _countOrders = value;
+                OnPropertyChanged();
+            }
+        }
+        public double RevenuesTotal
+        {    // for binding
+            get { return _revenuesTotal; }
+            set
+            {
+                _revenuesTotal = value;
+                OnPropertyChanged();
+            }
+        }
+        public int CountPrintJobs
+        {    // for binding
+            get { return _countPrintJobs; }
+            set
+            {
+                _countPrintJobs = value;
+                OnPropertyChanged();
+            }
+        }
+
 
         //Setup line selection and button actions
         //Order tab contains button to open jobs listing in "OrderWindow" window for selected order
@@ -94,7 +137,7 @@ namespace DispoAdmin.ViewModels
         }
 
         public Material SelectedMaterial
-        {    // für Binding von Auswahl in Liste
+        {
             get { return _selectedMaterial; }
             set
             {
@@ -157,6 +200,11 @@ namespace DispoAdmin.ViewModels
             foreach (Printer k in context.Printers) _listPrinters.Add(k);
             foreach (ServiceLogEvent k in context.ServiceLogEvents) _listServices.Add(k);
             foreach (Material k in context.Materials) _listMaterials.Add(k);
+
+            _revenuesTotal = _listOrders.Select(o => o.OrderPrice).ToList().Sum();
+            _countOrders= _listOrders.Count;
+            _costsTotal = _listOrders.Select(o => o.PrintJobs.Select(p => p.Costs).ToList().Sum()).ToList().Sum();
+            _countPrintJobs= _listOrders.Select(o=>o.PrintJobs.Count()).Sum();
         }
 
         public void SaveStuff()
