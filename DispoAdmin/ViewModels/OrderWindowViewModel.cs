@@ -36,7 +36,7 @@ namespace DispoAdmin.ViewModels
 
         readonly DateTime dayDateStart = new(2022, 1, 3);
         readonly int depreciationTime = 5;
-        readonly int workHoursPerWeek = 20;
+        readonly int workHoursPerWeek = 10;
         readonly int laborHourlyRate = 35;
 
         private string gcodeText;

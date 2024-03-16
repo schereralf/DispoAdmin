@@ -137,7 +137,7 @@ namespace DispoAdmin.Views
 
                     //this assigns some job details to the extended button
 
-                    if (i==0 || ListSchedules[i].PrintJob.Order!= ListSchedules[i-1].PrintJob.Order) BackgroundBrush= PickBrush(rnd.Next(20));
+                    if (i==0 || ListSchedules[i].PrintJob.Order!= ListSchedules[i-1].PrintJob.Order) BackgroundBrush= PickBrush(rnd.Next(50));
 
                     b.Click += new RoutedEventHandler(OnButtonClick);
 
@@ -280,6 +280,7 @@ namespace DispoAdmin.Views
                 }
             }
         }
+
         class ExtendedButton : Button //this class inherits from button
         {
             public ExtendedButton()
