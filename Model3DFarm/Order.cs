@@ -26,7 +26,11 @@ namespace Model3DFarm
         [StringLength(50)]
         public string OrderName { get; set; }
         public double OrderPrice { get; set; }
-        
+
+        public double? PrintJobsCost { get; set; }
+
+        public int? PrintJobsCount { get; set; }
+
         [Column(TypeName = "DateTime")]
         public DateTime? DateIn { get; set; }
         
