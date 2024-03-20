@@ -30,7 +30,7 @@ namespace DispoAdmin.ViewModels
         private ServiceLogEvent _selectedService;
         private Material _selectedMaterial;
         private int _scheduleWeek;
-        private static readonly IList<string> availablePrinterModels =
+        private static readonly IList<string> _availablePrinterModels =
         [
             "Prusa i3",
             "Prusa Mini",
@@ -42,9 +42,9 @@ namespace DispoAdmin.ViewModels
         private double? _costsTotal;
         private int _countOrders;
         private double _revenuesTotal;
-        private int _countPrintJobs;
+        private int? _countPrintJobs;
 
-        public static IList<string> AvailablePrinterModels => availablePrinterModels;
+        public static IList<string> AvailablePrinterModels => _availablePrinterModels; 
         public double? CostsTotal
         {    // for binding
             get { return _costsTotal; }
@@ -72,7 +72,7 @@ namespace DispoAdmin.ViewModels
                 OnPropertyChanged();
             }
         }
-        public int CountPrintJobs
+        public int? CountPrintJobs
         {    // for binding
             get { return _countPrintJobs; }
             set
@@ -202,9 +202,9 @@ namespace DispoAdmin.ViewModels
             foreach (Material k in context.Materials) _listMaterials.Add(k);
 
             _revenuesTotal = _listOrders.Select(o => o.OrderPrice).ToList().Sum();
-            _countOrders= _listOrders.Count;
-            _costsTotal = _listOrders.Select(o => o.PrintJobs.Select(p => p.Costs).ToList().Sum()).ToList().Sum();
-            _countPrintJobs= _listOrders.Select(o=>o.PrintJobs.Count()).Sum();
+            _countOrders = _listOrders.Count;
+            _costsTotal = _listOrders.Select(o => o.PrintJobsCost).ToList().Sum();
+            _countPrintJobs = _listOrders.Select(o => o.PrintJobsCount).ToList().Sum(); ;
         }
 
         public void SaveStuff()

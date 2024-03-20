@@ -146,7 +146,7 @@
 
             <TabItem Header="Profitability">
                 <StackPanel DockPanel.Dock="Right" Margin="180,50,180,120">
-                    <Label Content="Here's an economic summary of your entries:" VerticalAlignment="Center"  Height="80" HorizontalAlignment="Center" FontSize="30"/>
+                    <Label Content="Here is an economic summary of your entries:" VerticalAlignment="Center"  Height="80" HorizontalAlignment="Center" FontSize="30"/>
                     <TextBlock HorizontalAlignment="left" Height="25" TextWrapping="Wrap"  Text="Total number of orders: "  VerticalAlignment="Center" Width="250" FontSize="15" />
                     <TextBox HorizontalAlignment="Right" Height="25" TextWrapping="Wrap"  Text="{Binding CountOrders}"  VerticalAlignment="Center" Width="110" />
                     <TextBlock HorizontalAlignment="left" Height="25" TextWrapping="Wrap"  Text="Total euros made: "  VerticalAlignment="Center" Width="250" FontSize="15" />

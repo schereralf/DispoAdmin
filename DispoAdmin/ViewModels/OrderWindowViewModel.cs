@@ -19,7 +19,7 @@ namespace DispoAdmin.ViewModels
         private Order _order;
 
         public Order Order
-        {    // 
+        {
             get { return _order;}
             set {_order = value;}
         }
@@ -118,6 +118,9 @@ namespace DispoAdmin.ViewModels
                     _listPrintJobs.Add(printJob);
                     _listSchedules.Add(schedule);
                 }
+                order.PrintJobsCost = _listPrintJobs.Select(c=>c.Costs).Sum();
+                order.PrintJobsCount = _listPrintJobs.Count;
+
                 initialContext.SaveChanges();
             }
         }
