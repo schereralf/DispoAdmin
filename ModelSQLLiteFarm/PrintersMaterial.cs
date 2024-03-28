@@ -4,7 +4,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace Model3DFarm
+namespace ModelSQLLiteFarm
 {
     [Keyless]
     public partial class PrintersMaterial

@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿
+using System.Windows;
 using DispoAdmin.ViewModels;
 
 namespace DispoAdmin.Views
@@ -14,6 +15,7 @@ namespace DispoAdmin.Views
             InitializeComponent();
 
             this.DataContext = new MainWindowViewModel();
+
         }
     }
 }

@@ -3,7 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Model3DFarm;
+//using Model3DFarm;
+using ModelSQLLiteFarm;
 using DispoBaseLib;
 using System.Windows.Input;
 using DispoAdmin.Models;
@@ -93,7 +94,7 @@ namespace DispoAdmin.ViewModels
                     printJob.OrderID = order.OrderID;
                     Schedule schedule = new()
                     {
-                        PrintJobID = printJob.JobID,
+                        JobID = printJob.JobID,
                         RO_Time = printJob.PrintTime,
                         TimeStart = order.DateIn,
                         TimeEnd = order.DateDue,
@@ -122,6 +123,7 @@ namespace DispoAdmin.ViewModels
                 order.PrintJobsCount = _listPrintJobs.Count;
 
                 initialContext.SaveChanges();
+
             }
         }
 
@@ -146,7 +148,7 @@ namespace DispoAdmin.ViewModels
 
             foreach (PrintJob printJob in updatedPrintJobsList)
             {
-                if (!printJob.JobName.IsNullOrEmpty())
+                if (!printJob.JobName.IsNullOrEmpty()&&!printJob.Material.IsNullOrEmpty())
                 {
                     printJob.OrderID = Order.OrderID;
                     updatedContext.PrintJobs.Add(printJob);
@@ -165,16 +167,18 @@ namespace DispoAdmin.ViewModels
             {
                 if (schedule.ScheduleWeek != null)
                 {
+                    schedule.PrintJob = updatedPrintJobsList.Where(p => p.JobID == schedule.JobID).FirstOrDefault();
+                    schedule.JobScheduleID = schedule.JobID; 
                     updatedContext.Schedules.Add(schedule);
                 }
             }
             updatedContext.SaveChanges();
-            MessageBox.Show("All saved, please hit OK  here and close this order window !");
-        }
+            MessageBox.Show("All saved, please hit OK here and then close the printjobs window for this order!");
+      }
 
         public void RemovePrintJob()
         {
-            Schedule s = _listSchedules.FirstOrDefault(s => s.PrintJobID == SelectedPrintJob.JobID);
+            Schedule s = _listSchedules.FirstOrDefault(s => s.JobID == SelectedPrintJob.JobID);
             ListPrintJobs.Remove(SelectedPrintJob);
             _listSchedules.Remove(s);
         }

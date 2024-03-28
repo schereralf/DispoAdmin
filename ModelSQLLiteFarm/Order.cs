@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Model3DFarm
+namespace ModelSQLLiteFarm
 {
     public partial class Order
     {
@@ -16,7 +16,7 @@ namespace Model3DFarm
 
         [Key]
         public int OrderID { get; set; }
-
+        
         [Required]
         [StringLength(50)]
         public string CustomerName { get; set; }

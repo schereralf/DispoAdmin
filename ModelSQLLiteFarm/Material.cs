@@ -4,7 +4,7 @@
 using System.ComponentModel.DataAnnotations;
 
 
-namespace Model3DFarm
+namespace ModelSQLLiteFarm
 {
     public partial class Material
     {

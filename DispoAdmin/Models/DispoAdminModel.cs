@@ -1,4 +1,5 @@
-﻿using Model3DFarm;
+﻿
+using ModelSQLLiteFarm;
 using System.Configuration;
 
 namespace DispoAdmin.Models
@@ -7,7 +8,7 @@ namespace DispoAdmin.Models
     class DispoAdminModel
     {
         private readonly string _dbConnection;
-        static DispoAdminModel _instance;
+        static readonly DispoAdminModel _instance;
 
         static DispoAdminModel()
         {
@@ -18,7 +19,7 @@ namespace DispoAdmin.Models
 
         private DispoAdminModel()            // get the DB connection string
         {
-            _dbConnection = ConfigurationManager.ConnectionStrings["PrinterFarm"].ConnectionString;
+            _dbConnection = ConfigurationManager.ConnectionStrings["PrinterFarmB"].ConnectionString;
         }
         
         public PrinterfarmContext GetDBContext()            // deliver a new DB context with connection

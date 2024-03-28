@@ -5,7 +5,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Model3DFarm
+namespace ModelSQLLiteFarm
 {
     public partial class ServiceLogEvent
     {

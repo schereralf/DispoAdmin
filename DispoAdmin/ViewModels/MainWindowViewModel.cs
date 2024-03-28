@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using DispoBaseLib;
-using Model3DFarm;
+//using Model3DFarm;
+using ModelSQLLiteFarm;
 using DispoAdmin.Models;
 using DispoAdmin.Views;
 using System.Windows.Input;
 using System.Windows;
 using System.Linq;
+using Microsoft.IdentityModel.Tokens;
+
 
 namespace DispoAdmin.ViewModels
 {
@@ -44,7 +47,7 @@ namespace DispoAdmin.ViewModels
         private double _revenuesTotal;
         private int? _countPrintJobs;
 
-        public static IList<string> AvailablePrinterModels => _availablePrinterModels; 
+        public static IList<string> AvailablePrinterModels => _availablePrinterModels;
         public double? CostsTotal
         {    // for binding
             get { return _costsTotal; }
@@ -88,20 +91,38 @@ namespace DispoAdmin.ViewModels
 
         public Order SelectedOrder
         {    // for binding
-            get { return _selectedOrder; }
+            get
+            {
+                if (_selectedOrder!=null&&(_selectedOrder.OrderName.IsNullOrEmpty()
+                     || _selectedOrder.CustomerName.IsNullOrEmpty()
+                     || _selectedOrder.OrderPrice == 0
+                     || !_selectedOrder.DateIn.HasValue
+                     || !_selectedOrder.DateDue.HasValue))
+                    MessageBox.Show("Warning ! Please ensure that there are proper values in all of the fields !");
+                return _selectedOrder;
+            }
+
             set
             {
                 _selectedOrder = value;
-                OnPropertyChanged();
-                _cmdViewOrder.RaiseCanExecuteChanged();
-                _cmdAddOrder.RaiseCanExecuteChanged();
-                _cmdRemoveOrder.RaiseCanExecuteChanged();
-                _cmdSaveStuff.RaiseCanExecuteChanged();
+
+                {
+                    OnPropertyChanged();
+                    _cmdViewOrder.RaiseCanExecuteChanged();
+                    _cmdAddOrder.RaiseCanExecuteChanged();
+                    _cmdRemoveOrder.RaiseCanExecuteChanged();
+                    _cmdSaveStuff.RaiseCanExecuteChanged();
+                }
             }
         }
         public Printer SelectedPrinter
         {    // for binding
-            get { return _selectedPrinter; }
+            get {
+                if (_selectedPrinter!=null&&(_selectedPrinter.PrinterType.IsNullOrEmpty()
+                   || !_selectedPrinter.PrinterPurchDate.HasValue
+                   || _selectedPrinter.PrinterPurchPrice==0))
+                   MessageBox.Show("Warning!! Please ensure that there are proper values in all of the fields !!");
+                return _selectedPrinter; }
             set
             {
                 _selectedPrinter = value;
@@ -118,6 +139,7 @@ namespace DispoAdmin.ViewModels
             set
             {
                 _scheduleWeek = value;
+
                 OnPropertyChanged();
                 _cmdRegSchedule.RaiseCanExecuteChanged();
             }
@@ -211,7 +233,7 @@ namespace DispoAdmin.ViewModels
         {
             PrinterfarmContext printerfarmContext = DispoAdminModel.Default.GetDBContext();
             using PrinterfarmContext updatedWorkSetup = printerfarmContext;
-            
+
             foreach (Order k in updatedWorkSetup.Orders) updatedWorkSetup.Orders.Remove(k);
             foreach (Printer k in updatedWorkSetup.Printers) updatedWorkSetup.Printers.Remove(k);
             foreach (ServiceLogEvent k in updatedWorkSetup.ServiceLogEvents) updatedWorkSetup.ServiceLogEvents.Remove(k);
@@ -229,7 +251,7 @@ namespace DispoAdmin.ViewModels
         public void AddOrder()
         {
             // TODO: include exception for when order due dates erroneoisly are <= the file dates !
-            ListOrders.Add(SelectedOrder); 
+            ListOrders.Add(SelectedOrder);
         }
 
         public void RemoveOrder()
@@ -270,16 +292,26 @@ namespace DispoAdmin.ViewModels
 
         //Pass over to view orders window
         public void ViewOrder()
-        {           
-            OrderWindow orderView = new(SelectedOrder);
-            orderView.ShowDialog();  
+        {
+            if (ListMaterials.IsNullOrEmpty() || ListPrinters.IsNullOrEmpty())
+            {
+                MessageBox.Show("Please ensure that you have defined printing materials and/or printers that you can use to print with before you create printjobs !");
+            }
+            else
+            {
+                OrderWindow orderView = new(SelectedOrder);
+                orderView.ShowDialog();
+            }
         }
 
         // Pass over to schedule window
         public void RegSchedule()
-        {           
-            DispoWindow scheduleView = new(ScheduleWeek);
-            scheduleView.ShowDialog();  
+        {
+            DispoWindow scheduleView = new(ScheduleWeek)
+            {
+                WindowStartupLocation = WindowStartupLocation.CenterScreen
+            };
+            scheduleView.ShowDialog();
         }
     }
 }
