@@ -1,3 +1,0 @@
-# DispoAdmin
-Version before addition of gcode parser
-scheduling wall works now from inside DispoAdmin.  All button-related code in DispoWindow.xaml.cs , adding next a bit of external logic for button placement though.

@@ -5,7 +5,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Model3DFarm
+namespace ModelSQLLiteFarm
 {
     [Table("Schedule")]
     public partial class Schedule
@@ -13,6 +13,7 @@ namespace Model3DFarm
         [Key]
         public int JobScheduleID { get; set; }
 
+        [Required]
         public int PrinterID { get; set; }
 
         public int JobID { get; set; }
@@ -20,6 +21,7 @@ namespace Model3DFarm
         [Column(TypeName = "DateTime")]
         public DateTime? TimeStart { get; set; }
 
+        [Column(TypeName = "DateTime")]
         public DateTime? TimeEnd { get; set; }
 
         public double? MR_Time { get; set; }

@@ -205,9 +205,10 @@
                 <RowDefinition Height="25" />
                 <RowDefinition Height="1*" />
                 <RowDefinition Height="25" />
+                <RowDefinition Height="1*" />
+                <RowDefinition Height="1" />
                 <RowDefinition Height="40" />
             </Grid.RowDefinitions>
-
-    </Grid>
+        </Grid>
     </Border>
 </Window>

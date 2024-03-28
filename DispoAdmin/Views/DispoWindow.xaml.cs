@@ -5,7 +5,8 @@ using System.Windows;
 using System.Windows.Controls;
 using DispoAdmin.Models;
 using System.Windows.Media;
-using Model3DFarm;
+//using Model3DFarm;
+using ModelSQLLiteFarm;
 using System.Reflection;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -97,7 +98,12 @@ namespace DispoAdmin.Views
                              orderby k.TimeStart
                              select k;
 
-                foreach (Schedule k in result) ListSchedules.Add(k);
+                foreach (Schedule k in result)
+                {
+                    k.PrintJob=context.PrintJobs.Where(s=>s.JobID==k.JobID).FirstOrDefault();
+                    k.PrintJob.Order=context.Orders.Where(o=>o.OrderID==k.PrintJob.OrderID).FirstOrDefault();
+                    ListSchedules.Add(k);
+                }
 
                 Button moveLeft = new();
                 moveLeft.Content = "<<== Push here to select the previous week";
@@ -110,7 +116,7 @@ namespace DispoAdmin.Views
                 Dispogrid.Children.Add(moveLeft);
 
                 Button moveRight = new();
-                moveRight.Content = "Push here to select the next week ==>>";
+                moveRight.Content = "Push here to select the following week ==>>";
                 moveRight.FontWeight = FontWeights.Bold;
                 Grid.SetRow(moveRight, 18);
                 Grid.SetColumn(moveRight, 120);
@@ -259,14 +265,16 @@ namespace DispoAdmin.Views
                 void OnButtonClick2(object sender, EventArgs e)
                 {
                     Close();
-                    DispoWindow w = new DispoWindow(ScheduleWeek - 1);
+                    DispoWindow w = new(ScheduleWeek - 1);
+                    w.WindowStartupLocation = WindowStartupLocation.CenterScreen;
                     w.ShowDialog();
                 }
 
                 void OnButtonClick3(object sender, EventArgs e)
                 {
                     Close();
-                    DispoWindow w = new DispoWindow(ScheduleWeek + 1);
+                    DispoWindow w = new(ScheduleWeek + 1);
+                    w.WindowStartupLocation = WindowStartupLocation.CenterScreen;
                     w.ShowDialog();
                 }
 

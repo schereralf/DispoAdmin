@@ -2,13 +2,12 @@
 
 #nullable disable
 
-using System;
 using Microsoft.EntityFrameworkCore;
 
-
-namespace Model3DFarm
+namespace ModelSQLLiteFarm
 {
     public partial class PrinterfarmContext : DbContext
+
     {
         string _dbConnection;
         public PrinterfarmContext()
@@ -37,9 +36,11 @@ namespace Model3DFarm
             {
                 if (!optionsBuilder.IsConfigured)
                 {
-                    optionsBuilder.UseLazyLoadingProxies();
+                    //optionsBuilder.UseLazyLoadingProxies();
 
-                    if (!String.IsNullOrWhiteSpace(_dbConnection)) optionsBuilder.UseSqlServer(_dbConnection);
+                    //if (!String.IsNullOrWhiteSpace(_dbConnection)) 
+                        //optionsBuilder.UseSqlite(_dbConnection);
+                    optionsBuilder.UseSqlite("Data Source=C:/Alf/MyPrinterFarm/Dispo08/DispoAdmin/MyPrinterFarm.db");
                 }
             }
         }
@@ -111,7 +112,7 @@ namespace Model3DFarm
             {
                 entity.HasOne(d => d.PrintJob)
                     .WithOne(p => p.PrintSchedule)
-                    //.HasForeignKey(d=>d.PrintID)
+                    //.HasForeignKey(d=>d.JobID)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Schedule_PrintJobs");
 
