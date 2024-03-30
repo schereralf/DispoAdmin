@@ -8,7 +8,13 @@
         d:DataContext="{d:DesignInstance Type=viewmodels:OrderWindowViewModel}"
         mc:Ignorable="d"
         
-        Title="My 3D Printer Farm - Print Jobs" Height="300" Width="1200">
+        Title="My 3D Printer Farm - Print Jobs" Height="300" Width="1600">
+
+    <Window.Resources>
+        <!--define+display of printers-->
+        <CollectionViewSource x:Key="myMaterialsList" Source="{Binding AvailableMaterials}"/>
+    </Window.Resources>
+
     <DockPanel Margin="20">
         <StackPanel DockPanel.Dock="Right" Margin="10,0,0,0">
             <Button Content="Remove PrintJob" Command="{Binding CmdRemovePrintJob}" Margin="0,5"/>
@@ -19,18 +25,17 @@
         <TextBox Text="{Binding Order.CustomerName}" HorizontalAlignment="Left" VerticalAlignment="Top" Height="20" Width="85" Margin="5,0" FontSize="10" />
         <TextBox Text="{Binding Order.OrderName}" HorizontalAlignment="Left" VerticalAlignment="Top" Height="20" Width="85" Margin="5,0" FontSize="10" />
 
-        <DataGrid ItemsSource="{Binding ListPrintJobs}" SelectedItem="{Binding SelectedPrintJob}" AutoGenerateColumns="False" Margin="-185,35,0,0">
+        <DataGrid ItemsSource="{Binding ListPrintJobs}" SelectedItem="{Binding SelectedPrintJob, TargetNullValue={x:Static CollectionView.NewItemPlaceholder}}" AutoGenerateColumns="False" Margin="-185,35,0,0">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Print Job Name" Binding="{Binding JobName}" Width="auto"/>
-                <DataGridTextColumn Header="Material" Binding="{Binding Material}" Width="auto"/>
+                <DataGridComboBoxColumn Header="Material"  SelectedItemBinding="{Binding Material}" ItemsSource="{Binding Source={StaticResource myMaterialsList}}" Width="100" />
                 <DataGridTextColumn Header="Layers, 0.01mm" Binding="{Binding LayerHeight}" Width="auto"/>
                 <DataGridTextColumn Header="Material, g" Binding="{Binding WeightMaterial, StringFormat={}{0:n2}}" Width="auto"/>
                 <DataGridTextColumn Header="PrintTime, h" Binding="{Binding PrintTime, StringFormat={}{0:n2}}" Width="auto"/>
-                <DataGridHyperlinkColumn Header="File Adress" Binding="{Binding GcodeAdresse}" Width="200"/>
+                <DataGridHyperlinkColumn Header="File Adress" Binding="{Binding GcodeAdress}" Width="600"/>
                 <DataGridTextColumn Header="Total Costs €" Binding="{Binding Costs, StringFormat={}{0:n2}}" Width="auto"/>
             </DataGrid.Columns>
         </DataGrid>
-
     </DockPanel>
 
 </Window>

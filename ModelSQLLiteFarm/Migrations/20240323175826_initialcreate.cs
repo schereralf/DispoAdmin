@@ -94,7 +94,7 @@ namespace ModelSQLLiteFarm.Migrations
                     VolY = table.Column<int>(type: "INTEGER", nullable: true),
                     VolZ = table.Column<int>(type: "INTEGER", nullable: true),
                     PrinterType = table.Column<int>(type: "INTEGER", nullable: false),
-                    GcodeAdresse = table.Column<string>(type: "TEXT", fixedLength: true, maxLength: 200, nullable: true),
+                    GcodeAdress = table.Column<string>(type: "TEXT", fixedLength: true, maxLength: 200, nullable: true),
                     PrintTime = table.Column<double>(type: "REAL", nullable: true),
                     Costs = table.Column<double>(type: "REAL", nullable: true)
                 },

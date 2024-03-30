@@ -62,7 +62,7 @@ namespace Model3DFarm
 
             modelBuilder.Entity<PrintJob>(entity =>
             {
-                entity.Property(e => e.GcodeAdresse).IsFixedLength(true);
+                entity.Property(e => e.GcodeAdress).IsFixedLength(true);
 
                 entity.Property(e => e.JobName).IsFixedLength(true);
 

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using DispoBaseLib;
-//using Model3DFarm;
 using ModelSQLLiteFarm;
 using DispoAdmin.Models;
 using DispoAdmin.Views;
@@ -42,12 +41,22 @@ namespace DispoAdmin.ViewModels
             "Ultimaker 2",
             "Resin Printer"
         ];
+        private static readonly IList<string> _availableMaterials =
+[
+            "PLA",
+            "ABS",
+            "PET-G",
+            "UV Resin",
+];
         private double? _costsTotal;
         private int _countOrders;
         private double _revenuesTotal;
         private int? _countPrintJobs;
+        //private List<double?> _countMaterials;
 
         public static IList<string> AvailablePrinterModels => _availablePrinterModels;
+        public static IList<string> AvailableMaterials => _availableMaterials;
+
         public double? CostsTotal
         {    // for binding
             get { return _costsTotal; }
@@ -85,6 +94,18 @@ namespace DispoAdmin.ViewModels
             }
         }
 
+        /*public List<double?> CountMaterials
+        {
+            get
+            {
+                return _countMaterials;
+            }
+            set
+            {
+                _countMaterials = value;
+                OnPropertyChanged();
+            }
+        }*/
 
         //Setup line selection and button actions
         //Order tab contains button to open jobs listing in "OrderWindow" window for selected order
@@ -105,7 +126,6 @@ namespace DispoAdmin.ViewModels
             set
             {
                 _selectedOrder = value;
-
                 {
                     OnPropertyChanged();
                     _cmdViewOrder.RaiseCanExecuteChanged();
@@ -226,7 +246,25 @@ namespace DispoAdmin.ViewModels
             _revenuesTotal = _listOrders.Select(o => o.OrderPrice).ToList().Sum();
             _countOrders = _listOrders.Count;
             _costsTotal = _listOrders.Select(o => o.PrintJobsCost).ToList().Sum();
-            _countPrintJobs = _listOrders.Select(o => o.PrintJobsCount).ToList().Sum(); ;
+            _countPrintJobs = _listOrders.Select(o => o.PrintJobsCount).ToList().Sum();
+
+            /*
+            foreach (string i in AvailableMaterials)
+            {
+                double? countlisti = 0;
+                foreach (Order o in  _listOrders) 
+                { 
+                foreach (PrintJob p in o.PrintJobs)
+                    {
+                        if (p.Material == i)
+                        {
+                            countlisti += p.WeightMaterial;
+                        }
+                    }
+                }
+                _countMaterials.Add(countlisti);
+            }
+            */
         }
 
         public void SaveStuff()

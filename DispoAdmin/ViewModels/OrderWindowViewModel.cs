@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-//using Model3DFarm;
 using ModelSQLLiteFarm;
 using DispoBaseLib;
 using System.Windows.Input;
@@ -30,6 +29,8 @@ namespace DispoAdmin.ViewModels
         public double printerHourlyRate = new();
         public IList<PrintJob> ListPrintJobs => _listPrintJobs;
         public IList<Schedule> ListSchedules => _listSchedules;
+        public IList<string> AvailableMaterials => MainWindowViewModel.AvailableMaterials;
+       
         public List<Material> Materials = [];
         public List<Printer> Printers = [];
 
@@ -58,7 +59,7 @@ namespace DispoAdmin.ViewModels
                 _cmdSavePrintJobs.RaiseCanExecuteChanged();
             }
         }
-
+        
         private readonly RelayCommand _cmdRemovePrintJob;
         private readonly RelayCommand _cmdParsePrintJob;
         private readonly RelayCommand _cmdSavePrintJobs;
@@ -123,7 +124,6 @@ namespace DispoAdmin.ViewModels
                 order.PrintJobsCount = _listPrintJobs.Count;
 
                 initialContext.SaveChanges();
-
             }
         }
 
@@ -198,11 +198,15 @@ namespace DispoAdmin.ViewModels
             };
 
             if (openFileDialog.ShowDialog() == true)
-                SelectedPrintJob.GcodeAdresse = openFileDialog.FileName[..25];
+                SelectedPrintJob.GcodeAdress = openFileDialog.FileName;
 
             string[] gcodeLines = File.ReadAllLines(openFileDialog.FileName);
+
+            // TODO: in case someone closes the gcode files window prematurely, set up a try catch exception handler here...
+
             gcodeText = File.ReadAllText(openFileDialog.FileName);
             ParseGcode(gcodeLines);
+            SavePrintJobs();
         }
 
         private void ParseGcode(string[] gcodeLines)

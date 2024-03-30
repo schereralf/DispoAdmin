@@ -3,15 +3,17 @@
 
 using System.ComponentModel.DataAnnotations;
 
-
 namespace ModelSQLLiteFarm
 {
     public partial class Material
     {
         [Key]
         public int MaterialID { get; set; }
+
         [StringLength(10)]
         public string MaterialName { get; set; }
         public double? MaterialPrice { get; set; }
+
+        //public double TotalMaterialUsed { get; set; }
     }
 }
