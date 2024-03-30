@@ -3,6 +3,8 @@
 #nullable disable
 
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Data.Common;
 
 namespace ModelSQLLiteFarm
 {
@@ -10,6 +12,8 @@ namespace ModelSQLLiteFarm
 
     {
         string _dbConnection;
+        string currentDirectory;
+        
         public PrinterfarmContext()
         {
         }
@@ -36,11 +40,10 @@ namespace ModelSQLLiteFarm
             {
                 if (!optionsBuilder.IsConfigured)
                 {
-                    //optionsBuilder.UseLazyLoadingProxies();
-
-                    //if (!String.IsNullOrWhiteSpace(_dbConnection)) 
-                        //optionsBuilder.UseSqlite(_dbConnection);
-                    optionsBuilder.UseSqlite("Data Source=C:/Alf/MyPrinterFarm/Dispo08/DispoAdmin/MyPrinterFarm.db");
+                    if (!String.IsNullOrWhiteSpace(_dbConnection))
+                        currentDirectory = Directory.GetCurrentDirectory();
+                        string theConnector = "Data Source="+currentDirectory + "\\MyPrinterFarm.db";
+                        optionsBuilder.UseSqlite(theConnector);
                 }
             }
         }
@@ -63,7 +66,7 @@ namespace ModelSQLLiteFarm
 
             modelBuilder.Entity<PrintJob>(entity =>
             {
-                entity.Property(e => e.GcodeAdresse).IsFixedLength(true);
+                entity.Property(e => e.GcodeAdress).IsFixedLength(true);
 
                 entity.Property(e => e.JobName).IsFixedLength(true);
 

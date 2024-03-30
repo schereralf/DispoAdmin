@@ -5,7 +5,6 @@ using System.Windows;
 using System.Windows.Controls;
 using DispoAdmin.Models;
 using System.Windows.Media;
-//using Model3DFarm;
 using ModelSQLLiteFarm;
 using System.Reflection;
 using System.Collections.ObjectModel;
@@ -14,6 +13,7 @@ using System.Globalization;
 namespace DispoAdmin.Views
 {
     // Interaction logic für DispoWindow.xaml
+
     public partial class DispoWindow : Window
     {
         public int ScheduleWeek;

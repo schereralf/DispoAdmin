@@ -20,6 +20,7 @@ namespace Model3DFarm
         [Column(TypeName = "DateTime")]
         public DateTime? TimeStart { get; set; }
 
+        [Column(TypeName = "DateTime")]
         public DateTime? TimeEnd { get; set; }
 
         public double? MR_Time { get; set; }

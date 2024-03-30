@@ -11,8 +11,9 @@
        Title="My 3D-Printer Farm" Height="600" Width="1000">
 
     <Window.Resources>
-        <!--Fetch list of printers-->
+        <!--define+display of printers-->
         <CollectionViewSource x:Key="myPrinterList" Source="{Binding AvailablePrinterModels}"/>
+        <CollectionViewSource x:Key="myMaterialsList" Source="{Binding AvailableMaterials}"/>
     </Window.Resources>
 
     <Grid>
@@ -22,6 +23,8 @@
             <TabItem Header="Cockpit">
                 <Label Content="My 3D Printer Farm" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30"/>
             </TabItem>
+
+            <!--define+display printers-->
             <TabItem Header="Printers" HorizontalAlignment="Left" Width="52" >
                 <DockPanel Margin="10">
                     <StackPanel DockPanel.Dock="Right" Margin="10,0,0,0">
@@ -45,24 +48,21 @@
                             <DataGridTextColumn Header="Purchase Price" Binding="{Binding PrinterPurchPrice}"  Width="auto" />
                         </DataGrid.Columns>
                     </DataGrid>
-
                 </DockPanel>
-                
             </TabItem>
             
+            <!--define+display of orders-->
             <TabItem Header="Orders" >
                 <DockPanel Margin="10">
                     <StackPanel DockPanel.Dock="Right" Margin="10,0,0,0">
-                        <Button Content="Update Order" Command="{Binding CmdUpdateOrder}" Margin="0,5" />
+                        <Button Content="Add Order" Command="{Binding CmdAddOrder}" Margin="0,5" />
                         <Button Content="Remove Order" Command="{Binding CmdRemoveOrder}" Margin="0,5" />
                         <Button Content="View Order" Command="{Binding CmdViewOrder}" Margin="0,5" />
                         <Button Content="SAVE" Command="{Binding CmdSaveStuff}" Margin="0,5"/>
-
                     </StackPanel>
 
-                    <DataGrid ItemsSource="{Binding ListOrders}" SelectedItem="{Binding SelectedOrder}" AutoGenerateColumns="False">
+                    <DataGrid ItemsSource="{Binding ListOrders}" SelectedItem="{Binding SelectedOrder, TargetNullValue={x:Static CollectionView.NewItemPlaceholder}}" AutoGenerateColumns="False">
                         <DataGrid.Columns>
-
                             <DataGridTextColumn Header="Customer" Binding="{Binding CustomerName}" Width="auto" />
                             <DataGridTextColumn Header="Order" Binding="{Binding OrderName}"  Width="auto"  />
                             <DataGridTemplateColumn Header="Date In" Width="auto" >
@@ -94,7 +94,8 @@
                     </DataGrid>
                 </DockPanel>
             </TabItem>
-
+            
+            <!--define+display of materials-->
             <TabItem Header="Material" >
                 <DockPanel Margin="10">
                     <StackPanel DockPanel.Dock="Right" Margin="10,0,0,0">
@@ -102,15 +103,16 @@
                         <Button Content="Remove Material" Command="{Binding CmdRemoveMaterial}" Margin="0,5" />
                         <Button Content="SAVE" Command="{Binding CmdSaveStuff}" Margin="0,5"/>
                     </StackPanel>
-                    <DataGrid ItemsSource="{Binding ListMaterials}" SelectedItem="{Binding SelectedMaterial}" AutoGenerateColumns="False">
+                    <DataGrid ItemsSource="{Binding ListMaterials}" SelectedItem="{Binding SelectedMaterial, TargetNullValue={x:Static CollectionView.NewItemPlaceholder}}" AutoGenerateColumns="False" >
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Material" Binding="{Binding MaterialName}" FontSize="10"/>
+                            <DataGridComboBoxColumn Header="Material"  SelectedItemBinding="{Binding MaterialName}" ItemsSource="{Binding Source={StaticResource myMaterialsList}}" Width="100" />
                             <DataGridTextColumn Header="Price per Kg" Binding="{Binding MaterialPrice}"  />
                         </DataGrid.Columns>
                     </DataGrid>
                 </DockPanel>
-
             </TabItem>
+
+            <!--Fetch schedule board-->
             <TabItem Header="Schedule">
                 <StackPanel DockPanel.Dock="Right" Margin="80,50,80,80">
                     <TextBox HorizontalAlignment="Center" Height="25" TextWrapping="Wrap"  Text="{Binding ScheduleWeek}"  VerticalAlignment="Center" Width="110" />
@@ -119,6 +121,7 @@
                 </StackPanel>
             </TabItem>
 
+            <!--Fetch incident log-->
             <TabItem Header="Incident Log">
                 <DockPanel Margin="10">
                     <StackPanel DockPanel.Dock="Right" Margin="10,0,0,0">
@@ -126,8 +129,7 @@
                         <Button Content="Remove Service Incident" Command="{Binding CmdRemoveService}" Margin="0,5" />
                         <Button Content="SAVE" Command="{Binding CmdSaveStuff}" Margin="0,5"/>
                     </StackPanel>
-
-                    <DataGrid ItemsSource="{Binding ListServices}" SelectedItem="{Binding SelectedService}" AutoGenerateColumns="False">
+                    <DataGrid ItemsSource="{Binding ListServices}" SelectedItem="{Binding SelectedService, TargetNullValue={x:Static CollectionView.NewItemPlaceholder}}" AutoGenerateColumns="False">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Incident Name" Binding="{Binding EventName}" FontSize="10"/>
                             <DataGridTextColumn Header="Event Category" Binding="{Binding EventCategory}"   />
@@ -145,19 +147,20 @@
                 </DockPanel>
             </TabItem>
 
+            <!--Fetch revenues and costs-->
             <TabItem Header="Profitability">
                 <Canvas  HorizontalAlignment="Center" VerticalAlignment="Center" Margin="180,50,180,120">
-                    <Label Content="Here is an economic summary of your entries:" VerticalAlignment="Top"  Height="60" HorizontalAlignment="Left" FontSize="30" Canvas.Left="-300" Canvas.Top="-90"/>
+                    <Label Content="Here is an economic summary of your entries:" VerticalAlignment="Top"  Height="60" HorizontalAlignment="Left" FontSize="30" Canvas.Left="-320" Canvas.Top="-90"/>
                     <Grid Height="175" Width="600" Canvas.Top="-10" Canvas.Left="-316" HorizontalAlignment="Left" VerticalAlignment="Center">
                         <Border BorderBrush="Black" BorderThickness="2"/>
-                        <TextBox Text="Total number of orders: " Margin="70,10,325,140" />
-                        <TextBox Text="{Binding CountOrders}" FontSize="10" Margin="400,10,80,140"/>
-                        <TextBox Text="Total euros made: " Margin="70,50,325,100" />
-                        <TextBox Text="{Binding RevenuesTotal, StringFormat=N2}" FontSize="10" Margin="400,50,80,100"/>
-                        <TextBox Text="Total number of printjobs: " Margin="70,90,325,60" />
-                        <TextBox Text="{Binding CountPrintJobs}" FontSize="10" Margin="400,90,80,60"/>
-                        <TextBox Text="Total euros spent: " Margin="70,130,325,20" />
-                        <TextBox Text="{Binding CostsTotal, StringFormat=N2}" FontSize="10" Margin="400,130,80,20"/>
+                        <TextBox Text="Total number of orders: " Margin="70,15,325,135" FontSize="15"/>
+                        <TextBox Text="{Binding CountOrders}" FontSize="15" Margin="400,15,80,135" TextChanged="TextBox_TextChanged"/>
+                        <TextBox Text="Total euros made: " Margin="70,53,325,97" FontSize="15"/>
+                        <TextBox Text="{Binding RevenuesTotal, StringFormat=N2}" FontSize="15" Margin="400,53,80,97"/>
+                        <TextBox Text="Total number of printjobs: " Margin="70,90,325,60" FontSize="15"/>
+                        <TextBox Text="{Binding CountPrintJobs}" FontSize="15" Margin="400,90,80,60"/>
+                        <TextBox Text="Total euros spent: " Margin="70,130,325,20" FontSize="15"/>
+                        <TextBox Text="{Binding CostsTotal, StringFormat=N2}" FontSize="15" Margin="400,130,80,20"/>
                     </Grid>
                 </Canvas>
             </TabItem>

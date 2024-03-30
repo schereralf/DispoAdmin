@@ -5,9 +5,7 @@ using DispoAdmin.ViewModels;
 namespace DispoAdmin.Views
 
 {
-    /// <summary>
     /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         public MainWindow()
@@ -15,6 +13,10 @@ namespace DispoAdmin.Views
             InitializeComponent();
 
             this.DataContext = new MainWindowViewModel();
+        }
+
+        private void TextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
 
         }
     }

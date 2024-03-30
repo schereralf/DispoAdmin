@@ -15,8 +15,8 @@ namespace Model3DFarm
 
         [Key]
         public int JobID { get; set; }
-        [Required]
 
+        [Required]
         [StringLength(50)]
         public string JobName { get; set; }
         public int? OrderID { get; set; }
@@ -36,13 +36,13 @@ namespace Model3DFarm
         public int PrinterType { get; set; }
 
         [StringLength(200)]
-        public string GcodeAdresse { get; set; }
+        public string GcodeAdress { get; set; }
 
         public double? PrintTime { get; set; }
 
         public double? Costs { get; set; }
 
-        [ForeignKey(nameof(JobID))]
+        //[ForeignKey(nameof(JobID))]
 
         public virtual Schedule PrintSchedule{ get; set; }
     }
