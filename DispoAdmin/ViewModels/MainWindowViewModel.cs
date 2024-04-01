@@ -15,7 +15,7 @@ namespace DispoAdmin.ViewModels
 {
     public class MainWindowViewModel : BaseViewModel
     {
-        //Setup Observable Collections and Items Lists  for each tab
+        //Setup Observable Collections and Items Lists for each tab
 
         private readonly ObservableCollection<Order> _listOrders;
         private readonly ObservableCollection<Printer> _listPrinters;
