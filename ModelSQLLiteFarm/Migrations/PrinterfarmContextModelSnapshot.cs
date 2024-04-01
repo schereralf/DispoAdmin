@@ -317,6 +317,7 @@ namespace ModelSQLLiteFarm.Migrations
                     b.HasOne("ModelSQLLiteFarm.PrintJob", "PrintJob")
                         .WithOne("PrintSchedule")
                         .HasForeignKey("JobID")
+                        //.HasForeignKey("ModelSQLLiteFarm.Schedule", "JobScheduleID")
                         .IsRequired()
                         .HasConstraintName("FK_Schedule_PrintJobs");
 
