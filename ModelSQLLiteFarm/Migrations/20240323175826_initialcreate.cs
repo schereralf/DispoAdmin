@@ -51,7 +51,7 @@ namespace ModelSQLLiteFarm.Migrations
                     PrinterID = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     PrinterType = table.Column<string>(type: "TEXT", fixedLength: true, maxLength: 20, nullable: false),
-                    PrinterPurchDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    PrinterPurchDate = table.Column<DateTime>(type: "DateTime", nullable: true),
                     PrinterPurchPrice = table.Column<double>(type: "REAL", nullable: false),
                     MRTimeEst = table.Column<double>(type: "REAL", nullable: true),
                     ServiceTimeEst = table.Column<double>(type: "REAL", nullable: true)
@@ -68,7 +68,7 @@ namespace ModelSQLLiteFarm.Migrations
                     EventID = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     EventName = table.Column<string>(type: "TEXT", fixedLength: true, maxLength: 50, nullable: false),
-                    EventDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    EventDate = table.Column<DateTime>(type: "DateTime", nullable: true),
                     EventLength_hrs = table.Column<int>(type: "INTEGER", nullable: true),
                     EventCategory = table.Column<string>(type: "TEXT", fixedLength: true, maxLength: 10, nullable: true),
                     EventCost_euro = table.Column<string>(type: "TEXT", fixedLength: true, maxLength: 10, nullable: true)
@@ -158,7 +158,7 @@ namespace ModelSQLLiteFarm.Migrations
                     PrinterID = table.Column<int>(type: "INTEGER", nullable: false),
                     JobID = table.Column<int>(type: "INTEGER", nullable: false),
                     TimeStart = table.Column<DateTime>(type: "DateTime", nullable: true),
-                    TimeEnd = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    TimeEnd = table.Column<DateTime>(type: "DateTime", nullable: true),
                     MR_Time = table.Column<double>(type: "REAL", nullable: true),
                     RO_Time = table.Column<double>(type: "REAL", nullable: true),
                     ScheduleWeek = table.Column<int>(type: "INTEGER", nullable: true)

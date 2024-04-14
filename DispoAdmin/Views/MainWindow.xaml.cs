@@ -1,5 +1,7 @@
 ﻿
+using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Documents;
 using DispoAdmin.ViewModels;
 
 namespace DispoAdmin.Views
@@ -17,7 +19,6 @@ namespace DispoAdmin.Views
 
         private void TextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {
-
         }
     }
 }

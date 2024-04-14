@@ -4,7 +4,7 @@ using System.Configuration;
 
 namespace DispoAdmin.Models
 {
-    // this class does admin stuff for connecting a SQL database.
+    // this class does admin stuff for connecting the SQLite database.
     class DispoAdminModel
     {
         private readonly string _dbConnection;
@@ -22,7 +22,7 @@ namespace DispoAdmin.Models
             _dbConnection = ConfigurationManager.ConnectionStrings["PrinterFarmB"].ConnectionString;
         }
         
-        public PrinterfarmContext GetDBContext()            // deliver a new DB context with connection
+        public PrinterfarmContext GetDBContext()     // deliver a new DB context with connection
         {
             return new PrinterfarmContext(_dbConnection);
         }
