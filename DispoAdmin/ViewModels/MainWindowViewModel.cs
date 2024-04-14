@@ -9,6 +9,10 @@ using System.Windows.Input;
 using System.Windows;
 using System.Linq;
 using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Text.Json;
+using System.IO;
+using System.ComponentModel.Design;
 
 
 namespace DispoAdmin.ViewModels
@@ -22,6 +26,8 @@ namespace DispoAdmin.ViewModels
         private readonly ObservableCollection<ServiceLogEvent> _listServices;
         private readonly ObservableCollection<Material> _listMaterials;
 
+        readonly string saveJsonPath = @"./savedParametersList.json";
+
         public IList<Order> ListOrders => _listOrders;
         public IList<Printer> ListPrinters => _listPrinters;
         public IList<ServiceLogEvent> ListServices => _listServices;
@@ -32,6 +38,11 @@ namespace DispoAdmin.ViewModels
         private ServiceLogEvent _selectedService;
         private Material _selectedMaterial;
         private int _scheduleWeek;
+        private int _scheduleYear;
+        private int _targetRateOfReturn;
+        private int _depreciationTime;
+        private int _workHoursPerWeek;
+        private int _laborHourlyRate;
         private static readonly IList<string> _availablePrinterModels =
         [
             "Prusa i3",
@@ -52,10 +63,81 @@ namespace DispoAdmin.ViewModels
         private int _countOrders;
         private double _revenuesTotal;
         private int? _countPrintJobs;
-        //private List<double?> _countMaterials;
 
         public static IList<string> AvailablePrinterModels => _availablePrinterModels;
         public static IList<string> AvailableMaterials => _availableMaterials;
+
+        public int ScheduleYear
+        {    // for binding
+            get {
+                if (_scheduleYear>DateTime.Today.Year || _scheduleYear< DateTime.Today.Year-10)
+                    MessageBox.Show("Warning ! This year is off limits, please select either the current year or any of the last 10 years !");
+
+                return _scheduleYear; }
+            set
+            {
+                _scheduleYear = value;
+                OnPropertyChanged();
+            }
+        }
+        public int TargetRateOfReturn
+        {
+            get
+            {
+                if (_targetRateOfReturn > 50 || _targetRateOfReturn < 0)
+                    MessageBox.Show("Warning ! Your IRR is either negative or too large (max is 50) !");
+                return _targetRateOfReturn;
+            }
+            set
+            {
+                _targetRateOfReturn = value;
+                OnPropertyChanged();
+            }
+        }
+        public int DepreciationTime
+        {
+            get 
+            {
+                if (_depreciationTime > 20 || _depreciationTime < 0)
+                    MessageBox.Show("Warning ! Your depreciation time is either negative or too large (max is 20) !");
+                return _depreciationTime; 
+            }
+            set 
+            { 
+                _depreciationTime=value;
+                OnPropertyChanged();
+            }
+        }
+
+        public int WorkHoursPerWeek
+        {
+            get
+            {
+                if (_workHoursPerWeek > 40 || _workHoursPerWeek < 5)
+                    MessageBox.Show("Warning ! Your weekly work hours are either too few (min is 5) or too many (max is 40) !");
+                return _workHoursPerWeek;
+            }
+            set
+            {
+                _workHoursPerWeek = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public int LaborHourlyRate
+        {
+            get
+            {
+                if (_laborHourlyRate > 1000 || _laborHourlyRate < 1)
+                    MessageBox.Show("Warning ! Your labor rate is either too small (min is 1) or too large (max is 1000) !");
+                return _laborHourlyRate;
+            }
+            set
+            {
+                _laborHourlyRate = value;
+                OnPropertyChanged();
+            }
+        }
 
         public double? CostsTotal
         {    // for binding
@@ -94,22 +176,6 @@ namespace DispoAdmin.ViewModels
             }
         }
 
-        /*public List<double?> CountMaterials
-        {
-            get
-            {
-                return _countMaterials;
-            }
-            set
-            {
-                _countMaterials = value;
-                OnPropertyChanged();
-            }
-        }*/
-
-        //Setup line selection and button actions
-        //Order tab contains button to open jobs listing in "OrderWindow" window for selected order
-
         public Order SelectedOrder
         {    // for binding
             get
@@ -129,7 +195,6 @@ namespace DispoAdmin.ViewModels
                 {
                     OnPropertyChanged();
                     _cmdViewOrder.RaiseCanExecuteChanged();
-                    _cmdAddOrder.RaiseCanExecuteChanged();
                     _cmdRemoveOrder.RaiseCanExecuteChanged();
                     _cmdSaveStuff.RaiseCanExecuteChanged();
                 }
@@ -147,7 +212,6 @@ namespace DispoAdmin.ViewModels
             {
                 _selectedPrinter = value;
                 OnPropertyChanged();
-                _cmdAddPrinter.RaiseCanExecuteChanged();
                 _cmdRemovePrinter.RaiseCanExecuteChanged();
                 _cmdSaveStuff.RaiseCanExecuteChanged();
             }
@@ -172,7 +236,6 @@ namespace DispoAdmin.ViewModels
             {
                 _selectedService = value;
                 OnPropertyChanged();
-                _cmdAddService.RaiseCanExecuteChanged();
                 _cmdRemoveService.RaiseCanExecuteChanged();
                 _cmdSaveStuff.RaiseCanExecuteChanged();
             }
@@ -185,33 +248,24 @@ namespace DispoAdmin.ViewModels
             {
                 _selectedMaterial = value;
                 OnPropertyChanged();
-                _cmdAddMaterial.RaiseCanExecuteChanged();
                 _cmdRemoveMaterial.RaiseCanExecuteChanged();
                 _cmdSaveStuff.RaiseCanExecuteChanged();
             }
         }
 
         readonly RelayCommand _cmdViewOrder;
-        readonly RelayCommand _cmdAddOrder;
         readonly RelayCommand _cmdRemoveOrder;
-        readonly RelayCommand _cmdAddPrinter;
         readonly RelayCommand _cmdRemovePrinter;
-        readonly RelayCommand _cmdAddService;
         readonly RelayCommand _cmdRemoveService;
         readonly RelayCommand _cmdRegSchedule;
-        readonly RelayCommand _cmdAddMaterial;
         readonly RelayCommand _cmdRemoveMaterial;
         readonly RelayCommand _cmdSaveStuff;
 
         public ICommand CmdViewOrder { get { return _cmdViewOrder; } }
-        public ICommand CmdAddOrder { get { return _cmdAddOrder; } }
         public ICommand CmdRemoveOrder { get { return _cmdRemoveOrder; } }
-        public ICommand CmdAddPrinter { get { return _cmdAddPrinter; } }
         public ICommand CmdRemovePrinter { get { return _cmdRemovePrinter; } }
-        public ICommand CmdAddService { get { return _cmdAddService; } }
         public ICommand CmdRemoveService { get { return _cmdRemoveService; } }
         public ICommand CmdRegSchedule { get { return _cmdRegSchedule; } }
-        public ICommand CmdAddMaterial { get { return _cmdAddMaterial; } }
         public ICommand CmdRemoveMaterial { get { return _cmdRemoveMaterial; } }
         public ICommand CmdSaveStuff { get { return _cmdSaveStuff; } }
 
@@ -221,20 +275,23 @@ namespace DispoAdmin.ViewModels
             PrinterfarmContext printerfarmContext = DispoAdminModel.Default.GetDBContext();
             using PrinterfarmContext context = printerfarmContext;
 
+            var _framework = GetFramework();
+            _scheduleYear= _framework[0];
+            _targetRateOfReturn= _framework[1];
+            _depreciationTime= _framework[2];
+            _workHoursPerWeek= _framework[3];
+            _laborHourlyRate= _framework[4];
+
             _listOrders = [];
             _listPrinters = [];
             _listServices = [];
             _listMaterials = [];
 
             _cmdViewOrder = new RelayCommand(ViewOrder, () => SelectedOrder != null);
-            _cmdAddOrder = new RelayCommand(AddOrder, () => SelectedOrder != null);
             _cmdRemoveOrder = new RelayCommand(RemoveOrder, () => SelectedOrder != null);
-            _cmdAddPrinter = new RelayCommand(AddPrinter, () => SelectedPrinter != null);
             _cmdRemovePrinter = new RelayCommand(RemovePrinter, () => SelectedPrinter != null);
-            _cmdAddService = new RelayCommand(AddService, () => SelectedService != null);
             _cmdRemoveService = new RelayCommand(RemoveService, () => SelectedService != null);
             _cmdRegSchedule = new RelayCommand(RegSchedule);
-            _cmdAddMaterial = new RelayCommand(AddMaterial, () => SelectedMaterial != null);
             _cmdRemoveMaterial = new RelayCommand(RemoveMaterial, () => SelectedMaterial != null);
             _cmdSaveStuff = new RelayCommand(SaveStuff);
 
@@ -248,23 +305,7 @@ namespace DispoAdmin.ViewModels
             _costsTotal = _listOrders.Select(o => o.PrintJobsCost).ToList().Sum();
             _countPrintJobs = _listOrders.Select(o => o.PrintJobsCount).ToList().Sum();
 
-            /*
-            foreach (string i in AvailableMaterials)
-            {
-                double? countlisti = 0;
-                foreach (Order o in  _listOrders) 
-                { 
-                foreach (PrintJob p in o.PrintJobs)
-                    {
-                        if (p.Material == i)
-                        {
-                            countlisti += p.WeightMaterial;
-                        }
-                    }
-                }
-                _countMaterials.Add(countlisti);
-            }
-            */
+            SaveFramework(_scheduleYear, _targetRateOfReturn, _depreciationTime, _workHoursPerWeek, _laborHourlyRate);
         }
 
         public void SaveStuff()
@@ -284,11 +325,12 @@ namespace DispoAdmin.ViewModels
 
             updatedWorkSetup.SaveChanges();
             MessageBox.Show("All saved, please hit OK  here and move to the next window\n or just close this window and revisit your printer park later !");
+            SaveFramework(_scheduleYear, _targetRateOfReturn, _depreciationTime, _workHoursPerWeek, _laborHourlyRate);
         }
 
         public void AddOrder()
         {
-            // TODO: include exception for when order due dates erroneoisly are <= the file dates !
+            // TODO: include exception for when order due dates erroneously are <= the file dates !
             ListOrders.Add(SelectedOrder);
         }
 
@@ -337,7 +379,7 @@ namespace DispoAdmin.ViewModels
             }
             else
             {
-                OrderWindow orderView = new(SelectedOrder);
+                OrderWindow orderView = new(SelectedOrder, ScheduleYear, TargetRateOfReturn, DepreciationTime, WorkHoursPerWeek, LaborHourlyRate);
                 orderView.ShowDialog();
             }
         }
@@ -345,11 +387,44 @@ namespace DispoAdmin.ViewModels
         // Pass over to schedule window
         public void RegSchedule()
         {
-            DispoWindow scheduleView = new(ScheduleWeek)
+            DispoWindow scheduleView = new(ScheduleWeek, ScheduleYear)
             {
                 WindowStartupLocation = WindowStartupLocation.CenterScreen
             };
             scheduleView.ShowDialog();
         }
+
+
+        public void SaveFramework(int selectedyear, int targetrateofreturn, int depreciation, int workhours, int hourlyrate)
+        {
+            List<string> frameworkAsString =
+            [
+                selectedyear.ToString(),
+                targetrateofreturn.ToString(),
+                depreciation.ToString(),
+                workhours.ToString(),
+                hourlyrate.ToString(),
+            ];
+
+            var recipesListAsJson = JsonSerializer.Serialize(frameworkAsString);
+
+            // Saving json copy of the recipe names, ingredients and ids in a local directory           
+            File.WriteAllText(saveJsonPath, recipesListAsJson);
+        }
+        
+        public List<int> GetFramework()
+        {
+            List<int> myFramework = new() { 0, 0,0,0 ,0};
+            if (File.Exists(saveJsonPath))
+            {
+                string serializedFramework = File.ReadAllText(saveJsonPath);
+                List<string>? workingFramework = JsonSerializer.Deserialize<List<string>>(serializedFramework);
+                if (workingFramework != null)
+                    for (int i=0; i<5; i++) { myFramework[i] = int.Parse(workingFramework[i]); }
+                else Console.WriteLine("Note that we have no analytical framework data entered yet !");
+            }
+            return myFramework;
+        }
+
     }
 }

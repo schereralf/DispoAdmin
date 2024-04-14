@@ -29,17 +29,14 @@ namespace DispoAdmin.ViewModels
         public double printerHourlyRate = new();
         public IList<PrintJob> ListPrintJobs => _listPrintJobs;
         public IList<Schedule> ListSchedules => _listSchedules;
-        public IList<string> AvailableMaterials => MainWindowViewModel.AvailableMaterials;
-       
+        public static IList<string> AvailableMaterials => MainWindowViewModel.AvailableMaterials;
+
         public List<Material> Materials = [];
         public List<Printer> Printers = [];
 
         private PrintJob _selectedPrintJob;
 
-        readonly DateTime dayDateStart = new(2022, 1, 3);
-        readonly int depreciationTime = 5;
-        readonly int workHoursPerWeek = 10;
-        readonly int laborHourlyRate = 35;
+        readonly DateTime dayDateStart;
 
         private string gcodeText;
         private int layerheight;
@@ -69,9 +66,11 @@ namespace DispoAdmin.ViewModels
         public ICommand CmdSavePrintJobs { get { return _cmdSavePrintJobs; } }
 
         // Constructor with order as parameter
-        public OrderWindowViewModel(Order order)
+        public OrderWindowViewModel(Order order, int year, int rateOfReturn, int depreciationTime, int workHoursPerWeek, int laborHourlyRate)
         {
             Order = order;
+            dayDateStart = new(year, 1, 1);
+            while (dayDateStart.DayOfWeek != DayOfWeek.Monday) { dayDateStart=dayDateStart.AddDays(1); }
 
             _listPrintJobs = [];
             _listSchedules = [];
@@ -112,13 +111,16 @@ namespace DispoAdmin.ViewModels
                     //  - only machine time is counted, which includes MR and run time (no proper maintenance can be scheduled here yet)
 
                     materialPrice = (double)printJobMaterial.MaterialPrice;
-                    printerHourlyRate = printJobPrinter.PrinterPurchPrice / depreciationTime / workHoursPerWeek / 52;
+                    printerHourlyRate = printJobPrinter.PrinterPurchPrice / depreciationTime / workHoursPerWeek / 52*(1+rateOfReturn/100);
 
                     schedule.MR_Time = printJobPrinter.MRTimeEst;
                     printJob.Costs = materialPrice * printJob.WeightMaterial / 1000 + (schedule.MR_Time + schedule.RO_Time) * printerHourlyRate + schedule.MR_Time * laborHourlyRate;
 
-                    _listPrintJobs.Add(printJob);
-                    _listSchedules.Add(schedule);
+                    if (printJob.OrderID != null)
+                    {
+                        _listPrintJobs.Add(printJob);
+                        _listSchedules.Add(schedule);
+                    }
                 }
                 order.PrintJobsCost = _listPrintJobs.Select(c=>c.Costs).Sum();
                 order.PrintJobsCount = _listPrintJobs.Count;

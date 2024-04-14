@@ -17,6 +17,7 @@ namespace DispoAdmin.Views
     public partial class DispoWindow : Window
     {
         public int ScheduleWeek;
+        public int ScheduleYear;
         private readonly ObservableCollection<Schedule> _listSchedules;
         public IList<Schedule> ListSchedules => _listSchedules;
         readonly List<Printer> ListPrinters = [];
@@ -39,12 +40,15 @@ namespace DispoAdmin.Views
         private readonly int jobDeadline;
         public Brush BackgroundBrush;
 
-        public DispoWindow(int scheduleWeek)
+        public DispoWindow(int scheduleWeek, int scheduleYear)
         {
             InitializeComponent();
 
             ScheduleWeek = scheduleWeek;
-            DateTime dayDateStart = new(2022, 1, 3);
+            ScheduleYear= scheduleYear;
+
+            DateTime dayDateStart = new(ScheduleYear, 1, 1);
+            while (dayDateStart.DayOfWeek != DayOfWeek.Monday) { dayDateStart=dayDateStart.AddDays(1); }
 
             int NewDate = (scheduleWeek - 1) * 7;
 
@@ -105,9 +109,11 @@ namespace DispoAdmin.Views
                     ListSchedules.Add(k);
                 }
 
-                Button moveLeft = new();
-                moveLeft.Content = "<<== Push here to select the previous week";
-                moveLeft.FontWeight = FontWeights.Bold;
+                Button moveLeft = new()
+                {
+                    Content = "<<== Push here to select the previous week",
+                    FontWeight = FontWeights.Bold
+                };
                 Grid.SetRow(moveLeft, 18);
                 Grid.SetColumn(moveLeft, 5);
                 Grid.SetColumnSpan(moveLeft, 40);
@@ -115,9 +121,11 @@ namespace DispoAdmin.Views
                 moveLeft.Click += new RoutedEventHandler(OnButtonClick2);
                 Dispogrid.Children.Add(moveLeft);
 
-                Button moveRight = new();
-                moveRight.Content = "Push here to select the following week ==>>";
-                moveRight.FontWeight = FontWeights.Bold;
+                Button moveRight = new()
+                {
+                    Content = "Push here to select the following week ==>>",
+                    FontWeight = FontWeights.Bold
+                };
                 Grid.SetRow(moveRight, 18);
                 Grid.SetColumn(moveRight, 120);
                 Grid.SetColumnSpan(moveRight, 40);
@@ -265,16 +273,20 @@ namespace DispoAdmin.Views
                 void OnButtonClick2(object sender, EventArgs e)
                 {
                     Close();
-                    DispoWindow w = new(ScheduleWeek - 1);
-                    w.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                    DispoWindow w = new(ScheduleWeek - 1, ScheduleYear)
+                    {
+                        WindowStartupLocation = WindowStartupLocation.CenterScreen
+                    };
                     w.ShowDialog();
                 }
 
                 void OnButtonClick3(object sender, EventArgs e)
                 {
                     Close();
-                    DispoWindow w = new(ScheduleWeek + 1);
-                    w.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                    DispoWindow w = new(ScheduleWeek + 1, ScheduleYear)
+                    {
+                        WindowStartupLocation = WindowStartupLocation.CenterScreen
+                    };
                     w.ShowDialog();
                 }
 

@@ -21,14 +21,30 @@
         </Grid.ColumnDefinitions>
         <TabControl Grid.ColumnSpan="2">
             <TabItem Header="Cockpit">
-                <Label Content="My 3D Printer Farm" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30"/>
+                <Canvas  HorizontalAlignment="Center" VerticalAlignment="Center" Margin="180,50,180,120">
+                    <Label Content="Please Check or Adjust YOUR Printer&#xD;&#xA;         
+   Farm's Basic Parameters" VerticalAlignment="Top"  Height="96" HorizontalAlignment="Left" FontSize="30" Canvas.Left="-259" Canvas.Top="-147" Width="500"/>
+
+                    <Grid Height="210" Width="600" Canvas.Top="-10" Canvas.Left="-330" HorizontalAlignment="Left" VerticalAlignment="Center">
+                        <Border BorderBrush="Black" BorderThickness="2"/>
+                        <TextBox Text="What is the year that you want to assess ?" Margin="70,15,250,170" FontSize="15"/>
+                        <TextBox Text="{Binding ScheduleYear}" FontSize="15" Margin="400,15,80,170" TextChanged="TextBox_TextChanged"/>
+                        <TextBox Text="What is your internal rate of return in % ?" Margin="70,55,250,130" FontSize="15"/>
+                        <TextBox Text="{Binding TargetRateOfReturn}" FontSize="15" Margin="400,55,80,130"/>
+                        <TextBox Text="Depreciation time for equipment in years ?" Margin="70,95,225,90" FontSize="15"/>
+                        <TextBox Text="{Binding DepreciationTime}" FontSize="15" Margin="400,95,80,90"/>
+                        <TextBox Text="Number of operator work hours per week ?" Margin="70,135,225,50" FontSize="15"/>
+                        <TextBox Text="{Binding WorkHoursPerWeek}" FontSize="15" Margin="400,135,80,50"/>
+                        <TextBox Text="Operator hourly labor rate ?" Margin="70,175,325,10" FontSize="15"/>
+                        <TextBox Text="{Binding LaborHourlyRate}" FontSize="15" Margin="400,175,80,10"/>
+                    </Grid>
+                </Canvas>
             </TabItem>
 
             <!--define+display printers-->
             <TabItem Header="Printers" HorizontalAlignment="Left" Width="52" >
                 <DockPanel Margin="10">
                     <StackPanel DockPanel.Dock="Right" Margin="10,0,0,0">
-                        <Button Content="Add Printer" Command="{Binding CmdAddPrinter}" Margin="0,5" />
                         <Button Content="Remove Printer" Command="{Binding CmdRemovePrinter}" Margin="0,5"/>
                         <Button Content="SAVE" Command="{Binding CmdSaveStuff}" Margin="0,5"/>
                     </StackPanel>
@@ -50,12 +66,11 @@
                     </DataGrid>
                 </DockPanel>
             </TabItem>
-            
+
             <!--define+display of orders-->
             <TabItem Header="Orders" >
                 <DockPanel Margin="10">
                     <StackPanel DockPanel.Dock="Right" Margin="10,0,0,0">
-                        <Button Content="Add Order" Command="{Binding CmdAddOrder}" Margin="0,5" />
                         <Button Content="Remove Order" Command="{Binding CmdRemoveOrder}" Margin="0,5" />
                         <Button Content="View Order" Command="{Binding CmdViewOrder}" Margin="0,5" />
                         <Button Content="SAVE" Command="{Binding CmdSaveStuff}" Margin="0,5"/>
@@ -69,7 +84,7 @@
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <DatePicker SelectedDate="{Binding DateIn}" BorderThickness="0">
-                                        <DatePicker.BlackoutDates>
+                                            <DatePicker.BlackoutDates>
                                                 <CalendarDateRange End="01/01/2022" />
                                                 <CalendarDateRange Start="1/1/2023" />
                                             </DatePicker.BlackoutDates>
@@ -81,10 +96,10 @@
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <DatePicker SelectedDate="{Binding DateDue}" BorderThickness="0">
-                                        <DatePicker.BlackoutDates>
+                                            <DatePicker.BlackoutDates>
                                                 <CalendarDateRange End="01/01/2022" />
                                                 <CalendarDateRange Start="1/1/2023" />
-                                        </DatePicker.BlackoutDates>
+                                            </DatePicker.BlackoutDates>
                                         </DatePicker>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
@@ -94,12 +109,12 @@
                     </DataGrid>
                 </DockPanel>
             </TabItem>
-            
+
             <!--define+display of materials-->
             <TabItem Header="Material" >
                 <DockPanel Margin="10">
                     <StackPanel DockPanel.Dock="Right" Margin="10,0,0,0">
-                        <Button Content="Add Material" Command="{Binding CmdAddMaterial}" Margin="0,5" />
+
                         <Button Content="Remove Material" Command="{Binding CmdRemoveMaterial}" Margin="0,5" />
                         <Button Content="SAVE" Command="{Binding CmdSaveStuff}" Margin="0,5"/>
                     </StackPanel>
@@ -125,7 +140,6 @@
             <TabItem Header="Incident Log">
                 <DockPanel Margin="10">
                     <StackPanel DockPanel.Dock="Right" Margin="10,0,0,0">
-                        <Button Content="Add Service Incident" Command="{Binding CmdAddService}" Margin="0,5" />
                         <Button Content="Remove Service Incident" Command="{Binding CmdRemoveService}" Margin="0,5" />
                         <Button Content="SAVE" Command="{Binding CmdSaveStuff}" Margin="0,5"/>
                     </StackPanel>
@@ -142,6 +156,7 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                             <DataGridTextColumn Header="Event Cost" Binding="{Binding EventCost_euro}"  />
+                            <DataGridTextColumn Header="Est. Events/year" Binding="{Binding EventCost_euro}"  />
                         </DataGrid.Columns>
                     </DataGrid>
                 </DockPanel>

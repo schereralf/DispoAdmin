@@ -10,11 +10,11 @@ namespace DispoAdmin.Views
 
     public partial class OrderWindow : Window
     {
-            public OrderWindow(Order order)
+            public OrderWindow(Order order, int year, int rateOfReturn, int depreciationTime, int workHoursPerWeek, int laborHourlyRate)
         {
             InitializeComponent();
 
-            this.DataContext = new OrderWindowViewModel(order);
+            this.DataContext = new OrderWindowViewModel(order, year, rateOfReturn, depreciationTime, workHoursPerWeek, laborHourlyRate);
         }
     }
 }
