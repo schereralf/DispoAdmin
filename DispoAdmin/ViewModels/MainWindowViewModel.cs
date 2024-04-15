@@ -414,11 +414,11 @@ namespace DispoAdmin.ViewModels
         
         public List<int> GetFramework()
         {
-            List<int> myFramework = new() { 0, 0,0,0 ,0};
+            List<int> myFramework = [0, 0, 0, 0, 0];
             if (File.Exists(saveJsonPath))
             {
                 string serializedFramework = File.ReadAllText(saveJsonPath);
-                List<string>? workingFramework = JsonSerializer.Deserialize<List<string>>(serializedFramework);
+                var workingFramework = JsonSerializer.Deserialize<List<string>>(serializedFramework);
                 if (workingFramework != null)
                     for (int i=0; i<5; i++) { myFramework[i] = int.Parse(workingFramework[i]); }
                 else Console.WriteLine("Note that we have no analytical framework data entered yet !");
