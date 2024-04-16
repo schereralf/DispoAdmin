@@ -41,6 +41,7 @@ namespace DispoAdmin.ViewModels
         private string gcodeText;
         private int layerheight;
         private int prusastart;
+        private int gcodestart;
         public PrintJob SelectedPrintJob
         {
             //in addition to add, remove and save print jobs in an order, a fourth option called
@@ -106,7 +107,7 @@ namespace DispoAdmin.ViewModels
                     Printer printJobPrinter = Printers.FirstOrDefault(p => p.PrinterID == printJob.PrinterType);
 
                     //The economic calculations are very rudimentary.  We assume:
-                    //  - the amortization period for all printers is 5 years, at zero IRR
+                    //  - the amortization period for all printers is provided by the operator, as is the IRR
                     //  - average loading of available total hours per year (includes weekends, holidays and 24 hrs a day) is 24%
                     //  - only machine time is counted, which includes MR and run time (no proper maintenance can be scheduled here yet)
 
@@ -269,6 +270,7 @@ namespace DispoAdmin.ViewModels
         private void Read_PrusaMini(string[] gcodeLines)
         {
             for (int i = 0; i < gcodeLines.Length; i++) if (gcodeLines[i].Contains("filament used [mm]")) prusastart = i;
+                else if (gcodeLines[i].Contains("layer_gcode")) gcodestart = i;
 
             string printtimetxt = gcodeLines[prusastart + 6][(gcodeLines[prusastart + 6].IndexOf("= ") + 1)..];
             string hourstxt = printtimetxt[..printtimetxt.IndexOf('h')];
@@ -284,7 +286,7 @@ namespace DispoAdmin.ViewModels
             float weightmaterial = float.Parse(weightmaterialtxt.Trim(), System.Globalization.CultureInfo.InvariantCulture);
             SelectedPrintJob.WeightMaterial = (double)weightmaterial;
 
-            string layertxt = gcodeLines[prusastart + 124][(gcodeLines[prusastart + 124].IndexOf("= ") + 1)..];
+            string layertxt = gcodeLines[gcodestart + 1][(gcodeLines[gcodestart + 1].IndexOf("= ") + 2)..];
             float layerheight = 100 * float.Parse(layertxt, System.Globalization.CultureInfo.InvariantCulture);
             SelectedPrintJob.LayerHeight = (int)layerheight;
 

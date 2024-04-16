@@ -27,15 +27,15 @@
 
                     <Grid Height="210" Width="600" Canvas.Top="-10" Canvas.Left="-330" HorizontalAlignment="Left" VerticalAlignment="Center">
                         <Border BorderBrush="Black" BorderThickness="2"/>
-                        <TextBox Text="What is the year that you want to assess ?" Margin="70,15,250,170" FontSize="15"/>
+                        <TextBox Text="What is the year that you want to assess ?" Margin="70,15,250,170" FontSize="15" BorderBrush="Transparent" IsReadOnly="True"/>
                         <TextBox Text="{Binding ScheduleYear}" FontSize="15" Margin="400,15,80,170" TextChanged="TextBox_TextChanged"/>
-                        <TextBox Text="What is your internal rate of return in % ?" Margin="70,55,250,130" FontSize="15"/>
+                        <TextBox Text="What is your internal rate of return in % ?" Margin="70,55,250,130" FontSize="15" BorderBrush="Transparent" IsReadOnly="True"/>
                         <TextBox Text="{Binding TargetRateOfReturn}" FontSize="15" Margin="400,55,80,130"/>
-                        <TextBox Text="Depreciation time for equipment in years ?" Margin="70,95,225,90" FontSize="15"/>
+                        <TextBox Text="Depreciation time for equipment in years ?" Margin="70,95,225,90" FontSize="15" BorderBrush="Transparent" IsReadOnly="True"/>
                         <TextBox Text="{Binding DepreciationTime}" FontSize="15" Margin="400,95,80,90"/>
-                        <TextBox Text="Number of operator work hours per week ?" Margin="70,135,225,50" FontSize="15"/>
+                        <TextBox Text="Number of operator work hours per week ?" Margin="70,135,225,50" FontSize="15" BorderBrush="Transparent" IsReadOnly="True"/>
                         <TextBox Text="{Binding WorkHoursPerWeek}" FontSize="15" Margin="400,135,80,50"/>
-                        <TextBox Text="Operator hourly labor rate ?" Margin="70,175,325,10" FontSize="15"/>
+                        <TextBox Text="Operator hourly labor rate ?" Margin="70,175,325,10" FontSize="15" BorderBrush="Transparent" IsReadOnly="True"/>
                         <TextBox Text="{Binding LaborHourlyRate}" FontSize="15" Margin="400,175,80,10"/>
                     </Grid>
                 </Canvas>
@@ -76,7 +76,7 @@
                         <Button Content="SAVE" Command="{Binding CmdSaveStuff}" Margin="0,5"/>
                     </StackPanel>
 
-                    <DataGrid ItemsSource="{Binding ListOrders}" SelectedItem="{Binding SelectedOrder, TargetNullValue={x:Static CollectionView.NewItemPlaceholder}}" AutoGenerateColumns="False">
+                    <DataGrid ItemsSource="{Binding ListOrders}" SelectedItem="{Binding SelectedOrder, TargetNullValue={x:Static CollectionView.NewItemPlaceholder}}" AutoGenerateColumns="False" SelectionChanged="DataGrid_SelectionChanged">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Customer" Binding="{Binding CustomerName}" Width="auto" />
                             <DataGridTextColumn Header="Order" Binding="{Binding OrderName}"  Width="auto"  />
@@ -86,7 +86,7 @@
                                         <DatePicker SelectedDate="{Binding DateIn}" BorderThickness="0">
                                             <DatePicker.BlackoutDates>
                                                 <CalendarDateRange End="01/01/2022" />
-                                                <CalendarDateRange Start="1/1/2023" />
+                                                <CalendarDateRange Start="1/1/2025" />
                                             </DatePicker.BlackoutDates>
                                         </DatePicker>
                                     </DataTemplate>
@@ -98,7 +98,7 @@
                                         <DatePicker SelectedDate="{Binding DateDue}" BorderThickness="0">
                                             <DatePicker.BlackoutDates>
                                                 <CalendarDateRange End="01/01/2022" />
-                                                <CalendarDateRange Start="1/1/2023" />
+                                                <CalendarDateRange Start="1/1/2025" />
                                             </DatePicker.BlackoutDates>
                                         </DatePicker>
                                     </DataTemplate>
@@ -168,13 +168,13 @@
                     <Label Content="Here is an economic summary of your entries:" VerticalAlignment="Top"  Height="60" HorizontalAlignment="Left" FontSize="30" Canvas.Left="-320" Canvas.Top="-90"/>
                     <Grid Height="175" Width="600" Canvas.Top="-10" Canvas.Left="-316" HorizontalAlignment="Left" VerticalAlignment="Center">
                         <Border BorderBrush="Black" BorderThickness="2"/>
-                        <TextBox Text="Total number of orders: " Margin="70,15,325,135" FontSize="15"/>
+                        <TextBox Text="Total number of orders: " Margin="70,15,325,135" FontSize="15" BorderBrush="Transparent" IsReadOnly="True"/>
                         <TextBox Text="{Binding CountOrders}" FontSize="15" Margin="400,15,80,135" TextChanged="TextBox_TextChanged"/>
-                        <TextBox Text="Total euros made: " Margin="70,53,325,97" FontSize="15"/>
+                        <TextBox Text="Total euros made: " Margin="70,53,325,97" FontSize="15" BorderBrush="Transparent" IsReadOnly="True"/>
                         <TextBox Text="{Binding RevenuesTotal, StringFormat=N2}" FontSize="15" Margin="400,53,80,97"/>
-                        <TextBox Text="Total number of printjobs: " Margin="70,90,325,60" FontSize="15"/>
+                        <TextBox Text="Total number of printjobs: " Margin="70,90,325,60" FontSize="15" BorderBrush="Transparent" IsReadOnly="True"/>
                         <TextBox Text="{Binding CountPrintJobs}" FontSize="15" Margin="400,90,80,60"/>
-                        <TextBox Text="Total euros spent: " Margin="70,130,325,20" FontSize="15"/>
+                        <TextBox Text="Total euros spent: " Margin="70,130,325,20" FontSize="15" BorderBrush="Transparent" IsReadOnly="True"/>
                         <TextBox Text="{Binding CostsTotal, StringFormat=N2}" FontSize="15" Margin="400,130,80,20"/>
                     </Grid>
                 </Canvas>
