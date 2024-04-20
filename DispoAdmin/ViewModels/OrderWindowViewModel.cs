@@ -247,7 +247,7 @@ namespace DispoAdmin.ViewModels
             float weightmaterial = (float)int.Parse(weightmaterialtxt) / 1000;
             SelectedPrintJob.WeightMaterial = (double)weightmaterial;
 
-            switch (nozzle) { case (float)0.4: { layerheight = 15; break; } case (float)0.15: { layerheight = 6; break; } default: { layerheight = 15; break; } }
+            switch (nozzle) { case (float)0.15: { layerheight = 10; break; } case (float)0.4: { layerheight = 20; break; } default: { layerheight = 30; break; } }
             SelectedPrintJob.LayerHeight = layerheight;
 
             string volXtxt = gcodeLines[8][(gcodeLines[8].IndexOf(':') + 1)..];
@@ -278,6 +278,7 @@ namespace DispoAdmin.ViewModels
             string secstxt = printtimetxt.Substring(printtimetxt.IndexOf('m') + 1, printtimetxt.IndexOf('s') - printtimetxt.IndexOf('m') - 1);
             SelectedPrintJob.PrintTime = (double)(int.Parse(hourstxt) + (float)int.Parse(minstxt) / 60 + (float)int.Parse(secstxt) / 3600);
 
+            //TODO:Check this one+update
             string nozzletxt = gcodeLines[prusastart + 58][(gcodeLines[prusastart + 58].IndexOf("= ") + 1)..];
             float nozzle = float.Parse(nozzletxt, System.Globalization.CultureInfo.InvariantCulture);
             SelectedPrintJob.NozzleDiam_mm = (double)nozzle;

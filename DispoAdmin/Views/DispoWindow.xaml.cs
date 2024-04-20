@@ -105,8 +105,12 @@ namespace DispoAdmin.Views
                 foreach (Schedule k in result)
                 {
                     k.PrintJob=context.PrintJobs.Where(s=>s.JobID==k.JobID).FirstOrDefault();
-                    k.PrintJob.Order=context.Orders.Where(o=>o.OrderID==k.PrintJob.OrderID).FirstOrDefault();
-                    ListSchedules.Add(k);
+                    if (k.PrintJob != null)
+                    {
+                        k.PrintJob.Order = context.Orders.Where(o => o.OrderID == k.PrintJob.OrderID).FirstOrDefault();
+                        ListSchedules.Add(k);
+                    }
+                    else context.Schedules.Remove(k);
                 }
 
                 Button moveLeft = new()

@@ -12,8 +12,6 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Text.Json;
 using System.IO;
-using System.ComponentModel.Design;
-
 
 namespace DispoAdmin.ViewModels
 {
@@ -138,7 +136,6 @@ namespace DispoAdmin.ViewModels
                 OnPropertyChanged();
             }
         }
-
         public double? CostsTotal
         {    // for binding
             get { return _costsTotal; }
@@ -200,6 +197,7 @@ namespace DispoAdmin.ViewModels
                 }
             }
         }
+
         public Printer SelectedPrinter
         {    // for binding
             get {
@@ -216,6 +214,7 @@ namespace DispoAdmin.ViewModels
                 _cmdSaveStuff.RaiseCanExecuteChanged();
             }
         }
+
         // Scheduler tab needs only field to specify week and the window start button 
         public int ScheduleWeek
         {
@@ -335,12 +334,13 @@ namespace DispoAdmin.ViewModels
 
         public void AddOrder()
         {
-            // TODO: include exception for when order due dates erroneously are <= the file dates !
             ListOrders.Add(SelectedOrder);
         }
 
         public void RemoveOrder()
         {
+            foreach (PrintJob p in SelectedOrder.PrintJobs) { SelectedOrder.PrintJobs.Remove(p); }
+
             ListOrders.Remove(SelectedOrder);
         }
 
@@ -399,7 +399,6 @@ namespace DispoAdmin.ViewModels
             scheduleView.ShowDialog();
         }
 
-
         public void SaveFramework(int selectedyear, int targetrateofreturn, int depreciation, int workhours, int hourlyrate)
         {
             List<string> frameworkAsString =
@@ -419,17 +418,16 @@ namespace DispoAdmin.ViewModels
         
         public List<int> GetFramework()
         {
-            List<int> myFramework = new() { 0, 0,0,0 ,0};
+            List<int> myFramework = [0, 0,0,0 ,0];
             if (File.Exists(saveJsonPath))
             {
                 string serializedFramework = File.ReadAllText(saveJsonPath);
-                List<string>? workingFramework = JsonSerializer.Deserialize<List<string>>(serializedFramework);
+                List<string> workingFramework = JsonSerializer.Deserialize<List<string>>(serializedFramework);
                 if (workingFramework != null)
                     for (int i=0; i<5; i++) { myFramework[i] = int.Parse(workingFramework[i]); }
                 else Console.WriteLine("Note that we have no analytical framework data entered yet !");
             }
             return myFramework;
         }
-
     }
 }
