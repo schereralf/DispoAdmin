@@ -3,14 +3,22 @@ using System.Windows.Input;
 
 namespace DispoBaseLib
 {
-    public class RelayCommand(Action execute, Func<bool> canExecute) : ICommand
+    public class RelayCommand : ICommand
     {
-        private readonly Action _execute = execute ?? throw new ArgumentNullException(nameof(execute));
-        private readonly Func<bool> _canExecute = canExecute;
+        private readonly Action _execute;
+        private readonly Func<bool> _canExecute;
         public event EventHandler CanExecuteChanged;
 
         public RelayCommand(Action execute)
-            : this(execute, null) {}
+            : this(execute, null)
+        {
+        }
+
+        public RelayCommand(Action execute, Func<bool> canExecute)
+        {
+            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
+            _canExecute = canExecute;
+        }
 
         public bool CanExecute(object parameter)
         {

@@ -13,13 +13,11 @@ namespace DispoAdmin.Views
         public MainWindow()
         {
             InitializeComponent();
-
             this.DataContext = new MainWindowViewModel();
         }
 
-        private void TextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-        }
+        private void TextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e) {}
+        private void DataGrid_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e) {}
     }
 }
 

@@ -12,8 +12,6 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Text.Json;
 using System.IO;
-using System.ComponentModel.Design;
-
 
 namespace DispoAdmin.ViewModels
 {
@@ -138,7 +136,6 @@ namespace DispoAdmin.ViewModels
                 OnPropertyChanged();
             }
         }
-
         public double? CostsTotal
         {    // for binding
             get { return _costsTotal; }
@@ -200,6 +197,7 @@ namespace DispoAdmin.ViewModels
                 }
             }
         }
+
         public Printer SelectedPrinter
         {    // for binding
             get {
@@ -216,6 +214,7 @@ namespace DispoAdmin.ViewModels
                 _cmdSaveStuff.RaiseCanExecuteChanged();
             }
         }
+
         // Scheduler tab needs only field to specify week and the window start button 
         public int ScheduleWeek
         {
@@ -313,15 +312,20 @@ namespace DispoAdmin.ViewModels
             PrinterfarmContext printerfarmContext = DispoAdminModel.Default.GetDBContext();
             using PrinterfarmContext updatedWorkSetup = printerfarmContext;
 
-            foreach (Order k in updatedWorkSetup.Orders) updatedWorkSetup.Orders.Remove(k);
-            foreach (Printer k in updatedWorkSetup.Printers) updatedWorkSetup.Printers.Remove(k);
-            foreach (ServiceLogEvent k in updatedWorkSetup.ServiceLogEvents) updatedWorkSetup.ServiceLogEvents.Remove(k);
-            foreach (Material k in updatedWorkSetup.Materials) updatedWorkSetup.Materials.Remove(k);
+            foreach (Order o in updatedWorkSetup.Orders) updatedWorkSetup.Orders.Remove(o);
+            foreach (Printer p in updatedWorkSetup.Printers) updatedWorkSetup.Printers.Remove(p);
+            foreach (ServiceLogEvent s in updatedWorkSetup.ServiceLogEvents) updatedWorkSetup.ServiceLogEvents.Remove(s);
+            foreach (Material m in updatedWorkSetup.Materials) updatedWorkSetup.Materials.Remove(m);
 
-            foreach (Order k in ListOrders) updatedWorkSetup.Orders.Add(k);
-            foreach (Printer k in ListPrinters) updatedWorkSetup.Printers.Add(k);
-            foreach (ServiceLogEvent k in ListServices) updatedWorkSetup.ServiceLogEvents.Add(k);
-            foreach (Material k in ListMaterials) updatedWorkSetup.Materials.Add(k);
+            foreach (Order o in ListOrders) updatedWorkSetup.Orders.Add(o);
+            foreach (Printer p in ListPrinters) updatedWorkSetup.Printers.Add(p);
+            foreach (ServiceLogEvent s in ListServices) updatedWorkSetup.ServiceLogEvents.Add(s);
+            foreach (Material m in ListMaterials) updatedWorkSetup.Materials.Add(m);
+
+            RevenuesTotal = ListOrders.Select(o => o.OrderPrice).ToList().Sum();
+            CountOrders = ListOrders.Count;
+            CostsTotal = ListOrders.Select(o => o.PrintJobsCost).ToList().Sum();
+            CountPrintJobs = ListOrders.Select(o => o.PrintJobsCount).ToList().Sum();
 
             updatedWorkSetup.SaveChanges();
             MessageBox.Show("All saved, please hit OK  here and move to the next window\n or just close this window and revisit your printer park later !");
@@ -330,12 +334,13 @@ namespace DispoAdmin.ViewModels
 
         public void AddOrder()
         {
-            // TODO: include exception for when order due dates erroneously are <= the file dates !
             ListOrders.Add(SelectedOrder);
         }
 
         public void RemoveOrder()
         {
+            foreach (PrintJob p in SelectedOrder.PrintJobs) { SelectedOrder.PrintJobs.Remove(p); }
+
             ListOrders.Remove(SelectedOrder);
         }
 
@@ -394,7 +399,6 @@ namespace DispoAdmin.ViewModels
             scheduleView.ShowDialog();
         }
 
-
         public void SaveFramework(int selectedyear, int targetrateofreturn, int depreciation, int workhours, int hourlyrate)
         {
             List<string> frameworkAsString =
@@ -414,17 +418,16 @@ namespace DispoAdmin.ViewModels
         
         public List<int> GetFramework()
         {
-            List<int> myFramework = [0, 0, 0, 0, 0];
+            List<int> myFramework = [0, 0,0,0 ,0];
             if (File.Exists(saveJsonPath))
             {
                 string serializedFramework = File.ReadAllText(saveJsonPath);
-                var workingFramework = JsonSerializer.Deserialize<List<string>>(serializedFramework);
+                List<string> workingFramework = JsonSerializer.Deserialize<List<string>>(serializedFramework);
                 if (workingFramework != null)
                     for (int i=0; i<5; i++) { myFramework[i] = int.Parse(workingFramework[i]); }
                 else Console.WriteLine("Note that we have no analytical framework data entered yet !");
             }
             return myFramework;
         }
-
     }
 }
