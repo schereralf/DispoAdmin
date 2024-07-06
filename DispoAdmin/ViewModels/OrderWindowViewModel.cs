@@ -1,4 +1,4 @@
-﻿
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -105,7 +105,7 @@ namespace DispoAdmin.ViewModels
 
                     Printer printJobPrinter = new();
                     Material printJobMaterial = Materials.FirstOrDefault(m => m.MaterialName.Trim() == printJob.Material.Trim());
-
+                    
                     if (printJob.Material == "UV Resin")
                     {
                         printJobPrinter = Printers.FirstOrDefault(p => p.PrinterType == "Resin Printer");
