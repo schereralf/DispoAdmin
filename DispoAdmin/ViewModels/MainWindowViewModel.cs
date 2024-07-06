@@ -339,8 +339,6 @@ namespace DispoAdmin.ViewModels
 
         public void RemoveOrder()
         {
-            foreach (PrintJob p in SelectedOrder.PrintJobs) { SelectedOrder.PrintJobs.Remove(p); }
-
             ListOrders.Remove(SelectedOrder);
         }
 
