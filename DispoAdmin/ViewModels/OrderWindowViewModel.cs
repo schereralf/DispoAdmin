@@ -103,8 +103,11 @@ namespace DispoAdmin.ViewModels
                         PrinterID = printJob.PrinterType
                     };
 
+                    Printer printJobPrinter = new();
                     Material printJobMaterial = Materials.FirstOrDefault(m => m.MaterialName.Trim() == printJob.Material.Trim());
-                    Printer printJobPrinter = Printers.FirstOrDefault(p => p.PrinterID == printJob.PrinterType);
+
+                    if (printJob.Material=="UV Resin") printJobPrinter= Printers.FirstOrDefault(p => p.PrinterType == "Resin Printer");
+                    else printJobPrinter = Printers.FirstOrDefault(p => p.PrinterID == printJob.PrinterType);
 
                     //The economic calculations are very rudimentary.  We assume:
                     //  - the amortization period for all printers is provided by the operator, as is the IRR
