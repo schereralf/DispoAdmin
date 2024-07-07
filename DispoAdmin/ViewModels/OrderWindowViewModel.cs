@@ -1,4 +1,4 @@
-﻿
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -105,8 +105,13 @@ namespace DispoAdmin.ViewModels
 
                     Printer printJobPrinter = new();
                     Material printJobMaterial = Materials.FirstOrDefault(m => m.MaterialName.Trim() == printJob.Material.Trim());
-
-                    if (printJob.Material=="UV Resin") printJobPrinter= Printers.FirstOrDefault(p => p.PrinterType == "Resin Printer");
+                    
+                    if (printJob.Material == "UV Resin")
+                    {
+                        printJobPrinter = Printers.FirstOrDefault(p => p.PrinterType == "Resin Printer");
+                        MessageBox.Show("When scheduling resin printers, please enter schedule-relevant data manually and don't try to use the gcode data extraction button !");
+                        printJob.GcodeAdress = "This PrintJob does not use Gcode";
+                    }
                     else printJobPrinter = Printers.FirstOrDefault(p => p.PrinterID == printJob.PrinterType);
 
                     //The economic calculations are very rudimentary.  We assume:
@@ -116,6 +121,8 @@ namespace DispoAdmin.ViewModels
 
                     materialPrice = (double)printJobMaterial.MaterialPrice;
                     printerHourlyRate = printJobPrinter.PrinterPurchPrice / depreciationTime / workHoursPerWeek / 52*(1+rateOfReturn/100);
+                    
+                    printJob.PrinterType=printJobPrinter.PrinterID;
 
                     schedule.MR_Time = printJobPrinter.MRTimeEst;
                     printJob.Costs = materialPrice * printJob.WeightMaterial / 1000 + (schedule.MR_Time + schedule.RO_Time) * printerHourlyRate + schedule.MR_Time * laborHourlyRate;
@@ -161,7 +168,7 @@ namespace DispoAdmin.ViewModels
                 }
                 else
                 {
-                    MessageBox.Show("Please give this job a name before closing the window, then hit the save button again !");
+                    MessageBox.Show("Please give this job a name and/or a material before closing the window, then hit the save button again !");
                 }
             }
 
@@ -199,19 +206,23 @@ namespace DispoAdmin.ViewModels
 
             OpenFileDialog openFileDialog = new()
             {
-                InitialDirectory = @"C:\Alf\Wifi_Coursework\GcodeFiles",
+                InitialDirectory = @"C:\",
                 Filter = "Gcode files (*.gcode)|*.gcode|All files (*.*)|*.*"
             };
 
             if (openFileDialog.ShowDialog() == true)
-                SelectedPrintJob.GcodeAdress = openFileDialog.FileName;
-
-            string[] gcodeLines = File.ReadAllLines(openFileDialog.FileName);
-
-            // TODO: in case someone closes the gcode files window prematurely, set up a try catch exception handler here...
-
-            gcodeText = File.ReadAllText(openFileDialog.FileName);
-            ParseGcode(gcodeLines);
+                _selectedPrintJob.GcodeAdress = openFileDialog.FileName;
+            try
+            {
+                string[] gcodeLines = File.ReadAllLines(openFileDialog.FileName);
+                gcodeText = File.ReadAllText(openFileDialog.FileName);
+                ParseGcode(gcodeLines);
+            }
+            catch 
+            {
+                MessageBox.Show("The filename you submitted here is null or empty");
+            }
+            // in case someone closes the gcode files window prematurely, set up a try catch exception handler here..
             SavePrintJobs();
         }
 
@@ -219,17 +230,17 @@ namespace DispoAdmin.ViewModels
         {
             if (gcodeText.Contains("UltiGCode") && gcodeText.Contains("Cura_SteamEngine"))
             {
-                SelectedPrintJob.PrinterType = Printers.Where(p=>p.PrinterType=="Ultimaker 2").FirstOrDefault().PrinterID;
+                _selectedPrintJob.PrinterType = Printers.Where(p=>p.PrinterType=="Ultimaker 2").FirstOrDefault().PrinterID;
                 Read_Ultimaker(gcodeLines);
             }
             else if (gcodeText.Contains("PrusaSlicer") && gcodeText.Contains("MINI"))
             {
-                SelectedPrintJob.PrinterType = Printers.Where(p => p.PrinterType == "Prusa Mini").FirstOrDefault().PrinterID;
+                _selectedPrintJob.PrinterType = Printers.Where(p => p.PrinterType == "Prusa Mini").FirstOrDefault().PrinterID;
                 Read_PrusaMini(gcodeLines);
             }
             else if (gcodeText.Contains("FLAVOR:Marlin") && (gcodeText.Contains("Cura_SteamEngine")))
             {
-                SelectedPrintJob.PrinterType = Printers.Where(p => p.PrinterType == "Ender 3").FirstOrDefault().PrinterID;
+                _selectedPrintJob.PrinterType = Printers.Where(p => p.PrinterType == "Ender 3").FirstOrDefault().PrinterID;
                 Read_Ender3(gcodeLines);
             }
             else MessageBox.Show ("This printer has not yet been included");
@@ -240,33 +251,33 @@ namespace DispoAdmin.ViewModels
         {
             string printtimetxt = gcodeLines[1][(gcodeLines[1].IndexOf(':') + 1)..];
             float printtime = (float)int.Parse(printtimetxt) / 3600;
-            SelectedPrintJob.PrintTime = (double)printtime;
+            _selectedPrintJob.PrintTime = (double)printtime;
 
             string nozzletxt = gcodeLines[4][(gcodeLines[4].IndexOf(':') + 1)..];
             float nozzle = float.Parse(nozzletxt, System.Globalization.CultureInfo.InvariantCulture);
-            SelectedPrintJob.NozzleDiam_mm = (double)nozzle;
+            _selectedPrintJob.NozzleDiam_mm = (double)nozzle;
 
             string weightmaterialtxt = gcodeLines[2][(gcodeLines[2].IndexOf(':') + 1)..];
             float weightmaterial = (float)int.Parse(weightmaterialtxt) / 1000;
-            SelectedPrintJob.WeightMaterial = (double)weightmaterial;
+            _selectedPrintJob.WeightMaterial = (double)weightmaterial;
 
             switch (nozzle) { case (float)0.15: { layerheight = 10; break; } case (float)0.4: { layerheight = 20; break; } default: { layerheight = 30; break; } }
-            SelectedPrintJob.LayerHeight = layerheight;
+            _selectedPrintJob.LayerHeight = layerheight;
 
             string volXtxt = gcodeLines[8][(gcodeLines[8].IndexOf(':') + 1)..];
             float volX = float.Parse(volXtxt, System.Globalization.CultureInfo.InvariantCulture);
             int volx = (int)volX;
-            SelectedPrintJob.VolX = volx;
+            _selectedPrintJob.VolX = volx;
 
             string volYtxt = gcodeLines[9][(gcodeLines[9].IndexOf(':') + 1)..];
             float volY = float.Parse(volYtxt, System.Globalization.CultureInfo.InvariantCulture);
             int voly = (int)volY;
-            SelectedPrintJob.VolY = voly;
+            _selectedPrintJob.VolY = voly;
 
             string volZtxt = gcodeLines[10][(gcodeLines[10].IndexOf(':') + 1)..];
             float volZ = float.Parse(volZtxt, System.Globalization.CultureInfo.InvariantCulture);
             int volz = (int)volZ;
-            SelectedPrintJob.VolZ = volz;
+            _selectedPrintJob.VolZ = volz;
         }
 
         // Second combination - Gcode for a Prusa Mini job created with the PrusaSlicer slicer 
@@ -279,29 +290,29 @@ namespace DispoAdmin.ViewModels
             string hourstxt = printtimetxt[..printtimetxt.IndexOf('h')];
             string minstxt = printtimetxt.Substring(printtimetxt.IndexOf('h') + 1, printtimetxt.IndexOf('m') - printtimetxt.IndexOf('h') - 1);
             string secstxt = printtimetxt.Substring(printtimetxt.IndexOf('m') + 1, printtimetxt.IndexOf('s') - printtimetxt.IndexOf('m') - 1);
-            SelectedPrintJob.PrintTime = (double)(int.Parse(hourstxt) + (float)int.Parse(minstxt) / 60 + (float)int.Parse(secstxt) / 3600);
+            _selectedPrintJob.PrintTime = (double)(int.Parse(hourstxt) + (float)int.Parse(minstxt) / 60 + (float)int.Parse(secstxt) / 3600);
 
             //TODO:Check this one+update
             string nozzletxt = gcodeLines[prusastart + 58][(gcodeLines[prusastart + 58].IndexOf("= ") + 1)..];
             float nozzle = float.Parse(nozzletxt, System.Globalization.CultureInfo.InvariantCulture);
-            SelectedPrintJob.NozzleDiam_mm = (double)nozzle;
+            _selectedPrintJob.NozzleDiam_mm = (double)nozzle;
 
             string weightmaterialtxt = gcodeLines[prusastart + 2][(gcodeLines[prusastart + 2].IndexOf("= ") + 1)..];
             float weightmaterial = float.Parse(weightmaterialtxt.Trim(), System.Globalization.CultureInfo.InvariantCulture);
-            SelectedPrintJob.WeightMaterial = (double)weightmaterial;
+            _selectedPrintJob.WeightMaterial = (double)weightmaterial;
 
             string layertxt = gcodeLines[gcodestart + 1][(gcodeLines[gcodestart + 1].IndexOf("= ") + 2)..];
             float layerheight = 100 * float.Parse(layertxt, System.Globalization.CultureInfo.InvariantCulture);
-            SelectedPrintJob.LayerHeight = (int)layerheight;
+            _selectedPrintJob.LayerHeight = (int)layerheight;
 
             int volx = 180;
-            SelectedPrintJob.VolX = volx;
+            _selectedPrintJob.VolX = volx;
 
             int voly = 180;
-            SelectedPrintJob.VolY = voly;
+            _selectedPrintJob.VolY = voly;
 
             int volz = 180;
-            SelectedPrintJob.VolZ = volz;
+            _selectedPrintJob.VolZ = volz;
         }
 
         // Third combination - Gcode for a Ender-3 job created with the Cura slicer 
@@ -309,33 +320,33 @@ namespace DispoAdmin.ViewModels
         {
             string printtimetxt = gcodeLines[1][(gcodeLines[1].IndexOf(':') + 1)..];
             float printtime = (float)int.Parse(printtimetxt) / 3600;
-            SelectedPrintJob.PrintTime = (double)printtime;
+            _selectedPrintJob.PrintTime = (double)printtime;
 
-            SelectedPrintJob.NozzleDiam_mm = 0.4;
+            _selectedPrintJob.NozzleDiam_mm = 0.4;
 
             string weightmaterialtxt = gcodeLines[2][(gcodeLines[2].IndexOf(':') + 1)..];
             string weighttxt2 = weightmaterialtxt[1..weightmaterialtxt.IndexOf('.')];
             float weightmaterial = int.Parse(weighttxt2);
-            SelectedPrintJob.WeightMaterial = (double)weightmaterial;
+            _selectedPrintJob.WeightMaterial = (double)weightmaterial;
 
             string layertxt = gcodeLines[3][(gcodeLines[2].IndexOf(':') + 1)..];
             float layerheight = float.Parse(layertxt, System.Globalization.CultureInfo.InvariantCulture) * 100;
-            SelectedPrintJob.LayerHeight = (int)layerheight;
+            _selectedPrintJob.LayerHeight = (int)layerheight;
 
             string volXtxt = gcodeLines[7][(gcodeLines[7].IndexOf(':') + 1)..];
             float volX = float.Parse(volXtxt, System.Globalization.CultureInfo.InvariantCulture);
             int volx = (int)volX;
-            SelectedPrintJob.VolX = volx;
+            _selectedPrintJob.VolX = volx;
 
             string volYtxt = gcodeLines[8][(gcodeLines[8].IndexOf(':') + 1)..];
             float volY = float.Parse(volYtxt, System.Globalization.CultureInfo.InvariantCulture);
             int voly = (int)volY;
-            SelectedPrintJob.VolY = voly;
+            _selectedPrintJob.VolY = voly;
 
             string volZtxt = gcodeLines[9][(gcodeLines[9].IndexOf(':') + 1)..];
             float volZ = float.Parse(volZtxt, System.Globalization.CultureInfo.InvariantCulture);
             int volz = (int)volZ;
-            SelectedPrintJob.VolZ = volz;
+            _selectedPrintJob.VolZ = volz;
         }
     }
 }
