@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -13,7 +12,8 @@ using System.Globalization;
 
 namespace DispoAdmin.Views
 {
-    // Interaction logic für DispoWindow.xaml.  Sorry, but this bit cannot go in a Viewmodel :)
+    // Interaction logic für DispoWindow.xaml
+
     public partial class DispoWindow : Window
     {
         public int ScheduleWeek;
